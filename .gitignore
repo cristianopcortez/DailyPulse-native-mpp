@@ -1,10 +1,58 @@
+﻿# Android Studio / IntelliJ
 *.iml
-.gradle
 .idea
-.DS_Store
+
+# Gradle
+.gradle
+
+# Build outputs (matches any directory or file named `build` under the repo)
 build
-captures
+
+# Generated native / CMake
 .externalNativeBuild
 .cxx
+
+# Android local SDK path — never commit
 local.properties
+
+# Kotlin incremental / K2 (Gradle Kotlin plugin cache)
+.kotlin/
+
+# Android bundles (if they ever land outside `build/`)
+*.apk
+*.aab
+*.ap_
+
+# Profiling
+*.hprof
+
+# Signing — never commit keys
+*.jks
+*.keystore
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Xcode — user-specific / local cache
 xcuserdata
+*.xcuserstate
+DerivedData/
+
+# Logs and env files (often hold API keys)
+*.log
+.env
+.env.*
+!.env.example
+
+# Fastlane (if you add it later)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+# Android Studio screen captures
+captures

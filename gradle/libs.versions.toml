@@ -1,9 +1,8 @@
 [versions]
-agp = "8.2.0-beta05"
+agp = "8.2.2"
 coilCompose = "2.5.0"
 kotlin = "1.9.22"
 compose = "1.5.1"
-accompanistSwiperefresh = "0.24.13-rc"
 compose-compiler = "1.5.3"
 compose-material3 = "1.2.1"
 androidx-activityCompose = "1.7.2"
@@ -13,6 +12,7 @@ navigationCompose = "2.7.5"
 ktorClient = "2.3.5"
 kotlinxDatetime = "0.4.1"
 koin = "3.6.0-wasm-alpha2"
+koinAndroidxCompose = "3.5.3"
 sqlDelight = "2.0.1"
 composeMultiplatform = "1.6.1"
 koinCompose = "1.1.2"
@@ -25,6 +25,9 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+# Old Android Material (pullrefresh); alias avoids libs.androidx.compose.* accessors that confuse the IDE
+# with the JetBrains compose plugin DSL.
+material-compose-android = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 
@@ -37,8 +40,12 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClient" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
+
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyagerVersion" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyagerVersion" }
