@@ -37,6 +37,7 @@ Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.co
 - [How the flavor switch works](#how-the-flavor-switch-works)
 - [Verifying Gradle dependencies](#verifying-gradle-dependencies)
 - [Course branches reference](#course-branches-reference)
+- [Author](#author)
 - [License](#license)
 
 ---
@@ -320,6 +321,12 @@ This portfolio edition is built on top of the original course branches. They are
 | `8_compose_android_iOS` | **Compose Multiplatform on Android + iOS (this branch's base)** |
 | `9_compose_desktop` | Desktop target (CMP) |
 | `10_compose_web` | Web target (CMP / Wasm) |
+
+---
+
+## Author
+
+Portfolio fork maintained by **[Cristiano Cortez](https://www.linkedin.com/in/cristianocortez/)**.
 
 ---
 

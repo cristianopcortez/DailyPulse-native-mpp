@@ -37,6 +37,7 @@ Código upstream: [github.com/petros-efthymiou/DailyPulse](https://github.com/pe
 - [Como o switch de flavor funciona](#como-o-switch-de-flavor-funciona)
 - [Verificando dependências do Gradle](#verificando-dependências-do-gradle)
 - [Branches do curso (referência)](#branches-do-curso-referência)
+- [Autor](#autor)
 - [Licença](#licença)
 
 ---
@@ -320,6 +321,12 @@ Esta versão de portfólio foi construída em cima das branches originais do cur
 | `8_compose_android_iOS` | **Compose Multiplatform no Android + iOS (base desta branch)** |
 | `9_compose_desktop` | Target Desktop (CMP) |
 | `10_compose_web` | Target Web (CMP / Wasm) |
+
+---
+
+## Autor
+
+Fork de portfólio mantido por **[Cristiano Cortez](https://www.linkedin.com/in/cristianocortez/)**.
 
 ---
 
