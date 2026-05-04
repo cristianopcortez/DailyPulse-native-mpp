@@ -1,0 +1,33 @@
+workflows:
+  kmp-workflow:
+    name: KMP Build & Test Lab
+    instance_type: mac_mini_m2
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'feature/codemagic-pipeline'
+          include: true
+          source: true
+    environment:
+      groups:
+        - FIREBASE_DAILYPULSE # Não esqueça de referenciar o grupo que criamos!
+    scripts:
+      - name: Set up Service Account
+        script: |
+          # Decode the Service Account key generated for the DailyPulse project
+          echo "$GCLOUD_SERVICE_ACCOUNT_KEY" | base64 --decode > ./gcloud_key.json
+
+      - name: Build Android & iOS (KMP)
+        script: |
+          # Command to compile shared modules and the Android application
+          ./gradlew assembleDebug
+
+      - name: Run Tests on Firebase Test Lab
+        script: |
+          # Authenticate using the generated Service Account key
+          gcloud auth activate-service-account --key-file=./gcloud_key.json
+          gcloud --quiet config set project daily-pulse-kmp # Your Firebase Project ID
+          
+          # Submit the Android build to Firebase Test Lab
+          gcloud firebase test android run --app build/outputs/apk/debug/app-debug.apk
