@@ -1,5 +1,7 @@
 # DailyPulse — KMP Portfolio Edition
 
+[![Codemagic build status](https://api.codemagic.io/apps/YOUR_CODEMAGIC_APP_ID/kmp-workflow/status_badge.svg)](https://codemagic.io/app/YOUR_CODEMAGIC_APP_ID/kmp-workflow/latest_build)
+
 [Read this in Portuguese (PT-BR) →](./README.pt-BR.md)
 
 > A news-reader app demonstrating **two ways of building UI on top of the same Kotlin Multiplatform business core**:
@@ -18,6 +20,8 @@ The original **DailyPulse** exercise repository and its progressive branches are
 2. [**Full-stack Compose Multiplatform Masterclass — KMP**](https://www.udemy.com/course/fullstack-compose-multiplatform-masterclass-kmp/)
 
 Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.com/petros-efthymiou/DailyPulse). This fork adds the Android `native` / `mpp` flavor split, iOS UI switching, and portfolio-focused documentation.
+
+Replace `YOUR_CODEMAGIC_APP_ID` in the badge URL above with the id from your Codemagic application page (`https://codemagic.io/app/<id>/…`). The `kmp-workflow` name matches `workflows.kmp-workflow` in [`codemagic.yaml`](./codemagic.yaml).
 
 ---
 

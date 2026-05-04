@@ -28,29 +28,32 @@ workflows:
           chmod +x gradlew
           # Debug APKs live under androidApp/build/outputs/apk/<flavor>/debug/ (see README).
           ./gradlew :androidApp:assembleMppDebug :androidApp:assembleMppDebugAndroidTest
-      - name: iOS unit tests (Simulator)
+      - name: iOS unit and integration tests (Simulator)
         script: |
           set -e
           chmod +x gradlew
           
-          # Full Xcode environment simulation for KMP
+          # 1. Simulate the full Xcode environment for KMP & Compose Resources
           export ARCHS="arm64"
           export SDK_NAME="iphonesimulator"
           export PLATFORM_NAME="iphonesimulator"
           export CONFIGURATION="Debug"
           
-          # Paths required by the embedAndSign task
-          export TARGET_BUILD_DIR="$(pwd)/shared/build/ios"
+          # 2. Define output paths to resolve the 'outputDir' validation error
+          # We use a temporary directory within the shared module build folder
+          export BUILT_PRODUCTS_DIR="$(pwd)/shared/build/ios"
+          export CONTENTS_FOLDER_PATH="."
+          export TARGET_BUILD_DIR="$BUILT_PRODUCTS_DIR"
           export FRAMEWORKS_FOLDER_PATH="Frameworks"
           
-          # Create the directory to avoid "File not found" errors
-          mkdir -p "$TARGET_BUILD_DIR"
+          # 3. Ensure the output directory exists before running Gradle
+          mkdir -p "$BUILT_PRODUCTS_DIR"
           
-          # Execute the shared framework build with the full context
+          # 4. Build the shared framework with the injected context
           ./gradlew :shared:embedAndSignAppleFrameworkForXcode
           
+          # 5. Execute both Unit and UI Tests on the simulator
           cd iosApp
-          # Run xcodebuild test including the new UI Test target
           xcodebuild test \
             -project iosApp.xcodeproj \
             -scheme iosApp \
