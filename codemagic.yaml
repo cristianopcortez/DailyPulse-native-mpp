@@ -33,15 +33,17 @@ workflows:
           set -e
           chmod +x gradlew
           
-          # Explicitly provide the environment properties required by the Compose Resources plugin.
-          # This prevents architecture inference errors when running outside of Xcode.
-          ./gradlew :shared:embedAndSignAppleFrameworkForXcode \
-            -Pkotlin.native.apple.target=ios_simulator_arm64 \
-            -Pkotlin.native.apple.archs=arm64 \
-            -Pkotlin.native.apple.sdk.name=iphonesimulator
+          # Export standard Xcode environment variables required by Compose Resources plugin
+          export ARCHS="arm64"
+          export SDK_NAME="iphonesimulator"
+          export PLATFORM_NAME="iphonesimulator"
+          export CONFIGURATION="Debug"
+          
+          # Build the shared framework with the necessary context
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode
           
           cd iosApp
-          # Run tests using xcodebuild on the simulator
+          # Run the tests (including your new XCUITest) on the simulator
           xcodebuild test \
             -project iosApp.xcodeproj \
             -scheme iosApp \
