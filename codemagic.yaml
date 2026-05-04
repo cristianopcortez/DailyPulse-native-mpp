@@ -17,10 +17,12 @@ workflows:
         script: |
           # Decode the Service Account key generated for the DailyPulse project
           echo "$GCLOUD_SERVICE_ACCOUNT_KEY" | base64 --decode > ./gcloud_key.json
-
       - name: Build Android & iOS (KMP)
         script: |
-          # Command to compile shared modules and the Android application
+        # Give execution permission to the Gradle Wrapper (crucial for Windows to Unix transfers)
+          chmod +x gradlew
+          
+        # Command to compile shared modules and the Android application
           ./gradlew assembleDebug
 
       - name: Run Tests on Firebase Test Lab
