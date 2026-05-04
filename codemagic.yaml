@@ -33,17 +33,23 @@ workflows:
           set -e
           chmod +x gradlew
           
-          # Export standard Xcode environment variables required by Compose Resources plugin
+          # Standard environment variables for architecture and SDK
           export ARCHS="arm64"
           export SDK_NAME="iphonesimulator"
           export PLATFORM_NAME="iphonesimulator"
           export CONFIGURATION="Debug"
           
-          # Build the shared framework with the necessary context
+          # Provide paths for the Compose Resources plugin outputDir
+          # We point these to the local build folder to satisfy Gradle's validation
+          export BUILT_PRODUCTS_DIR="$(pwd)/shared/build/ios"
+          export CONTENTS_FOLDER_PATH="."
+          
+          # Ensure the dummy directory exists
+          mkdir -p "$BUILT_PRODUCTS_DIR"
+          
           ./gradlew :shared:embedAndSignAppleFrameworkForXcode
           
           cd iosApp
-          # Run the tests (including your new XCUITest) on the simulator
           xcodebuild test \
             -project iosApp.xcodeproj \
             -scheme iosApp \
