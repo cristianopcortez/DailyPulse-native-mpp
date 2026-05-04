@@ -15,13 +15,23 @@ workflows:
     scripts:
       - name: Set up Service Account
         script: |
-          echo "$GCLOUD_SERVICE_ACCOUNT_KEY" | base64 --decode > ./gcloud_key.json
+          if [ -z "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" ]; then
+            echo "Error: GCLOUD_SERVICE_ACCOUNT_CREDENTIALS is empty. Verify if the group name in YAML matches the Codemagic UI."
+            exit 1
+          fi
+          # Using -D for macOS base64 compatibility
+          echo "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" | base64 -D > ./gcloud_key.json
       - name: Build Android & iOS (KMP)
         script: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          # Debug APKs live under androidApp/build/outputs/apk/<flavor>/debug/ (see README).
+          ./gradlew :androidApp:assembleMppDebug :androidApp:assembleMppDebugAndroidTest
       - name: Run Tests on Firebase Test Lab
         script: |
           gcloud auth activate-service-account --key-file=./gcloud_key.json
           gcloud --quiet config set project daily-pulse-kmp
-          gcloud firebase test android run --app build/outputs/apk/debug/app-debug.apk
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
+            --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
+            --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait
