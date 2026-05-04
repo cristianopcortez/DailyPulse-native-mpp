@@ -1,14 +1,3 @@
-//
-//  ArticlesScreen.swift
-//  iosApp
-//
-//  Created by Petros Efthymiou on 27/11/2023.
-//  Copyright © 2023 orgName. All rights reserved.
-//
-
-import SwiftUI
-import shared
-
 extension ArticlesScreen {
     
     @MainActor
@@ -17,99 +6,25 @@ extension ArticlesScreen {
         let articlesViewModel: ArticlesViewModel
         
         init() {
-            articlesViewModel = ArticlesInjector().articlesViewModel
-            articlesState = articlesViewModel.articlesState.value
+            let vm = ArticlesInjector().articlesViewModel
+            self.articlesViewModel = vm
+            // Fix: Explicitly cast Any? to ArticlesState
+            self.articlesState = vm.articlesState.value as! ArticlesState
         }
         
         @Published var articlesState: ArticlesState
         
         func startObserving() {
             Task {
+                // Fix: Access the sequence through the common interop bridge
+                // If you are not using SKIE, you might need to cast the flow 
+                // or use a helper method from your shared module.
                 for await articlesS in articlesViewModel.articlesState {
-                    self.articlesState = articlesS
-                }
-            }
-        }
-    }
-}
-
-struct ArticlesScreen: View {
-    
-    @ObservedObject private(set) var viewModel: ArticlesViewModelWrapper
-    
-    var body: some View {
-        VStack {
-            AppBar()
-            
-            
-            if let error = viewModel.articlesState.error {
-                ErrorMessage(message: error)
-            }
-            
-            if(!viewModel.articlesState.articles.isEmpty) {
-                ScrollView {
-                    LazyVStack(spacing: 10) {
-                        ForEach(viewModel.articlesState.articles, id: \.self) { article in
-                            ArticleItemView(article: article)
-                        }
+                    if let state = articlesS as? ArticlesState {
+                        self.articlesState = state
                     }
                 }
             }
-            
-        }.onAppear{
-            self.viewModel.startObserving()
-        }.onDisappear{
-            self.viewModel.articlesViewModel.clear()
         }
     }
 }
-
-struct AppBar: View {
-    var body: some View {
-        Text("Articles")
-            .font(.largeTitle)
-            .fontWeight(.bold)
-    }
-}
-
-struct ArticleItemView: View {
-    var article: Article
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            AsyncImage(url: URL(string: article.imageUrl)) { phase in
-                if phase.image != nil {
-                    phase.image!
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                } else if phase.error != nil {
-                    Text("Image Load Error")
-                } else {
-                    ProgressView()
-                }
-            }
-            Text(article.title)
-                .font(.title)
-                .fontWeight(.bold)
-            Text(article.desc)
-            Text(article.date).frame(maxWidth: .infinity, alignment: .trailing).foregroundStyle(.gray)
-        }
-        .padding(16)
-    }
-}
-
-struct Loader: View {
-    var body: some View {
-        ProgressView()
-    }
-}
-
-struct ErrorMessage: View {
-    var message: String
-    
-    var body: some View {
-        Text(message)
-            .font(.title)
-    }
-}
-
