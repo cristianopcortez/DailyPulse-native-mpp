@@ -33,9 +33,12 @@ workflows:
           set -e
           chmod +x gradlew
           
-          # Passamos o target explicitamente para o Gradle não se perder
+          # Explicitly provide the environment properties required by the Compose Resources plugin
+          # This prevents architecture inference errors when running outside of Xcode
           ./gradlew :shared:embedAndSignAppleFrameworkForXcode \
-            -Pkotlin.native.apple.target=ios_simulator_arm64
+            -Pkotlin.native.apple.target=ios_simulator_arm64 \
+            -Pkotlin.native.apple.archs=arm64 \
+            -Pkotlin.native.apple.sdk.name=iphonesimulator
           
           cd iosApp
           xcodebuild test \
