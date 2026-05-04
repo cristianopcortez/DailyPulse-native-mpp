@@ -29,7 +29,7 @@ workflows:
       - name: Run Tests on Firebase Test Lab
         script: |
           gcloud auth activate-service-account --key-file=./gcloud_key.json
-          gcloud --quiet config set project daily-pulse-kmp
+          gcloud --quiet config set project dailypulse-kmp
           gcloud firebase test android run \
             --type instrumentation \
             --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
