@@ -303,6 +303,29 @@ androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk
 androidApp/build/outputs/apk/native/debug/androidApp-native-debug.apk
 ```
 
+### Android instrumented tests / Firebase Test Lab
+
+Build the **mpp** debug app plus its instrumentation APK (same pair `codemagic.yaml` uses for Firebase Test Lab):
+
+```bash
+./gradlew :androidApp:assembleMppDebug :androidApp:assembleMppDebugAndroidTest
+```
+
+On a device or emulator:
+
+```bash
+./gradlew :androidApp:connectedMppDebugAndroidTest
+```
+
+For `gcloud firebase test android run --type instrumentation`, the **app** APK stays under `outputs/apk/<flavor>/debug/`, but the **test** APK is emitted under `outputs/apk/androidTest/...` (not beside the app):
+
+```
+androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk
+androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk
+```
+
+For the **native** flavor, use `assembleNativeDebug` / `assembleNativeDebugAndroidTest` (or `connectedNativeDebugAndroidTest`) and swap `mpp` for `native` in both paths.
+
 ---
 
 ## Course branches reference

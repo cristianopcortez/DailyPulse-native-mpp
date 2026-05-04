@@ -13,6 +13,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildFeatures {
         compose = true
@@ -85,4 +86,8 @@ dependencies {
     "nativeImplementation"(libs.coil.compose)
     "nativeImplementation"(libs.koin.androidx.compose)
     "nativeImplementation"(libs.material.compose.android) // androidx.compose.material (pullrefresh)
+
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.test.core)
 }
