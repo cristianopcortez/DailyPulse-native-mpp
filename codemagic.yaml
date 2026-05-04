@@ -33,23 +33,24 @@ workflows:
           set -e
           chmod +x gradlew
           
-          # Standard environment variables for architecture and SDK
+          # Full Xcode environment simulation for KMP
           export ARCHS="arm64"
           export SDK_NAME="iphonesimulator"
           export PLATFORM_NAME="iphonesimulator"
           export CONFIGURATION="Debug"
           
-          # Provide paths for the Compose Resources plugin outputDir
-          # We point these to the local build folder to satisfy Gradle's validation
-          export BUILT_PRODUCTS_DIR="$(pwd)/shared/build/ios"
-          export CONTENTS_FOLDER_PATH="."
+          # Paths required by the embedAndSign task
+          export TARGET_BUILD_DIR="$(pwd)/shared/build/ios"
+          export FRAMEWORKS_FOLDER_PATH="Frameworks"
           
-          # Ensure the dummy directory exists
-          mkdir -p "$BUILT_PRODUCTS_DIR"
+          # Create the directory to avoid "File not found" errors
+          mkdir -p "$TARGET_BUILD_DIR"
           
+          # Execute the shared framework build with the full context
           ./gradlew :shared:embedAndSignAppleFrameworkForXcode
           
           cd iosApp
+          # Run xcodebuild test including the new UI Test target
           xcodebuild test \
             -project iosApp.xcodeproj \
             -scheme iosApp \
