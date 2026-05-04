@@ -1,6 +1,6 @@
 # DailyPulse — KMP Portfolio Edition
 
-[![Codemagic build status](https://api.codemagic.io/apps/YOUR_CODEMAGIC_APP_ID/kmp-workflow/status_badge.svg)](https://codemagic.io/app/YOUR_CODEMAGIC_APP_ID/kmp-workflow/latest_build)
+[![Codemagic build status](https://api.codemagic.io/apps/69f8c24fe73167699549e9f5/kmp-workflow/status_badge.svg)](https://codemagic.io/app/69f8c24fe73167699549e9f5/kmp-workflow/latest_build)
 
 [Read this in Portuguese (PT-BR) →](./README.pt-BR.md)
 
@@ -21,7 +21,7 @@ The original **DailyPulse** exercise repository and its progressive branches are
 
 Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.com/petros-efthymiou/DailyPulse). This fork adds the Android `native` / `mpp` flavor split, iOS UI switching, and portfolio-focused documentation.
 
-Replace `YOUR_CODEMAGIC_APP_ID` in the badge URL above with the id from your Codemagic application page (`https://codemagic.io/app/<id>/…`). The `kmp-workflow` name matches `workflows.kmp-workflow` in [`codemagic.yaml`](./codemagic.yaml).
+The `kmp-workflow` name matches `workflows.kmp-workflow` in [`codemagic.yaml`](./codemagic.yaml).
 
 ---
 

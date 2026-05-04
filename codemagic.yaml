@@ -49,6 +49,9 @@ workflows:
           # 3. Ensure the output directory exists before running Gradle
           mkdir -p "$BUILT_PRODUCTS_DIR"
           
+          # 3.5. Install xcparse to extract media from .xcresult later
+          brew install chargepoint/xcparse/xcparse
+          
           # 4. Build the shared framework with the injected context
           ./gradlew :shared:embedAndSignAppleFrameworkForXcode
           
@@ -59,8 +62,17 @@ workflows:
             -scheme iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO
+      - name: Extract Media from XCUITest
+        script: |
+          # 5. Create a directory for media attachments
+          mkdir -p iosApp/TestMedia
+          
+          # 6. Extract Screenshots and Videos
+          # The 'screenshots' command automatically extracts all media attachments from the bundle
+          xcparse screenshots --path iosApp/TestResults.xcresult iosApp/TestMedia
       - name: Run Tests on Firebase Test Lab (Android)
         script: |
           gcloud auth activate-service-account --key-file=./gcloud_key.json
@@ -70,3 +82,8 @@ workflows:
             --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
             --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
             --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait
+
+artifacts:
+  - iosApp/TestMedia/**/*        # Allows viewing images/videos directly in the Codemagic UI
+  - iosApp/TestResults.xcresult  # Optional: keep the full bundle for deep debugging
+  - androidApp/build/outputs/apk/**/*.apk
