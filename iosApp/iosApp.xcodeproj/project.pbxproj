@@ -13,6 +13,11 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		B001FA02242A565900829871 /* NativeRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B001FA01242A565900829871 /* NativeRootView.swift */; };
+		B001FA04242A565900829871 /* ArticlesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B001FA03242A565900829871 /* ArticlesScreen.swift */; };
+		B001FA06242A565900829871 /* AboutScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B001FA05242A565900829871 /* AboutScreen.swift */; };
+		B001FA08242A565900829871 /* AboutListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B001FA07242A565900829871 /* AboutListView.swift */; };
+		B001FA0A242A565900829871 /* SourcesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = B001FA09242A565900829871 /* SourcesScreen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +44,11 @@
 		F1E20C08242A565900829871 /* iosAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosAppUITests.swift; sourceTree = "<group>"; };
 		F1E20C09242A565900829871 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B001FA01242A565900829871 /* NativeRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeRootView.swift; sourceTree = "<group>"; };
+		B001FA03242A565900829871 /* ArticlesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesScreen.swift; sourceTree = "<group>"; };
+		B001FA05242A565900829871 /* AboutScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutScreen.swift; sourceTree = "<group>"; };
+		B001FA07242A565900829871 /* AboutListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutListView.swift; sourceTree = "<group>"; };
+		B001FA09242A565900829871 /* SourcesScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SourcesScreen.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +84,17 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		B001FA0B242A565900829871 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				B001FA07242A565900829871 /* AboutListView.swift */,
+				B001FA05242A565900829871 /* AboutScreen.swift */,
+				B001FA03242A565900829871 /* ArticlesScreen.swift */,
+				B001FA09242A565900829871 /* SourcesScreen.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
 		7555FF72242A565900829871 = {
 			isa = PBXGroup;
 			children = (
@@ -102,7 +123,9 @@
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
+				B001FA01242A565900829871 /* NativeRootView.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
+				B001FA0B242A565900829871 /* Screens */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -284,6 +307,11 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				B001FA02242A565900829871 /* NativeRootView.swift in Sources */,
+				B001FA04242A565900829871 /* ArticlesScreen.swift in Sources */,
+				B001FA06242A565900829871 /* AboutScreen.swift in Sources */,
+				B001FA08242A565900829871 /* AboutListView.swift in Sources */,
+				B001FA0A242A565900829871 /* SourcesScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
