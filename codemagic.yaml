@@ -12,6 +12,8 @@ workflows:
     environment:
       groups:
         - FIREBASE_DAILYPULSE
+      xcode: latest
+      java: 17
     scripts:
       - name: Set up Service Account
         script: |
@@ -21,12 +23,27 @@ workflows:
           fi
           # Using -D for macOS base64 compatibility
           echo "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" | base64 -D > ./gcloud_key.json
-      - name: Build Android & iOS (KMP)
+      - name: Build Android (mpp debug + androidTest)
         script: |
           chmod +x gradlew
           # Debug APKs live under androidApp/build/outputs/apk/<flavor>/debug/ (see README).
           ./gradlew :androidApp:assembleMppDebug :androidApp:assembleMppDebugAndroidTest
-      - name: Run Tests on Firebase Test Lab
+      - name: iOS unit tests (Simulator)
+        script: |
+          set -e
+          chmod +x gradlew
+          # Shared Kotlin framework for Xcode (also runs again from the app's build phase).
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode
+          cd iosApp
+          # Shared scheme: iosApp/iosApp.xcodeproj/xcshareddata/xcschemes/iosApp.xcscheme
+          xcodebuild test \
+            -project iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Run Tests on Firebase Test Lab (Android)
         script: |
           gcloud auth activate-service-account --key-file=./gcloud_key.json
           gcloud --quiet config set project dailypulse-kmp
