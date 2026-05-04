@@ -32,16 +32,18 @@ workflows:
         script: |
           set -e
           chmod +x gradlew
-          # Shared Kotlin framework for Xcode (also runs again from the app's build phase).
-          ./gradlew :shared:embedAndSignAppleFrameworkForXcode
+          
+          # Passamos o target explicitamente para o Gradle não se perder
+          ./gradlew :shared:embedAndSignAppleFrameworkForXcode \
+            -Pkotlin.native.apple.target=ios_simulator_arm64
+          
           cd iosApp
-          # Shared scheme: iosApp/iosApp.xcodeproj/xcshareddata/xcschemes/iosApp.xcscheme
           xcodebuild test \
             -project iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Debug \
             -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
             CODE_SIGNING_ALLOWED=NO
       - name: Run Tests on Firebase Test Lab (Android)
         script: |
