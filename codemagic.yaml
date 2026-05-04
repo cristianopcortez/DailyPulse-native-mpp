@@ -11,25 +11,17 @@ workflows:
           source: true
     environment:
       groups:
-        - FIREBASE_DAILYPULSE # Não esqueça de referenciar o grupo que criamos!
+        - FIREBASE_DAILYPULSE
     scripts:
       - name: Set up Service Account
         script: |
-          # Decode the Service Account key generated for the DailyPulse project
           echo "$GCLOUD_SERVICE_ACCOUNT_KEY" | base64 --decode > ./gcloud_key.json
       - name: Build Android & iOS (KMP)
         script: |
-        # Give execution permission to the Gradle Wrapper (crucial for Windows to Unix transfers)
           chmod +x gradlew
-          
-        # Command to compile shared modules and the Android application
           ./gradlew assembleDebug
-
       - name: Run Tests on Firebase Test Lab
         script: |
-          # Authenticate using the generated Service Account key
           gcloud auth activate-service-account --key-file=./gcloud_key.json
-          gcloud --quiet config set project daily-pulse-kmp # Your Firebase Project ID
-          
-          # Submit the Android build to Firebase Test Lab
+          gcloud --quiet config set project daily-pulse-kmp
           gcloud firebase test android run --app build/outputs/apk/debug/app-debug.apk
