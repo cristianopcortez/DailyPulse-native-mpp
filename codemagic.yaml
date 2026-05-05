@@ -72,7 +72,7 @@ workflows:
           
           # 6. Extract Screenshots and Videos
           # The 'screenshots' command automatically extracts all media attachments from the bundle
-          xcparse screenshots --path iosApp/TestResults.xcresult iosApp/TestMedia
+          xcparse screenshots iosApp/TestResults.xcresult iosApp/TestMedia
       - name: Run Tests on Firebase Test Lab (Android)
         script: |
           gcloud auth activate-service-account --key-file=./gcloud_key.json
