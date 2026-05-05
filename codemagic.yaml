@@ -73,6 +73,15 @@ workflows:
           # 6. Extract Screenshots and Videos
           # The 'screenshots' command automatically extracts all media attachments from the bundle
           xcparse screenshots iosApp/TestResults.xcresult iosApp/TestMedia
+          
+          # 7. DEBUG: List the extracted files (This will appear in your build logs)
+          echo "--- Content of TestMedia folder ---"
+          ls -R iosApp/TestMedia
+          
+          # 8. DEBUG: Verify if the .xcresult bundle exists
+          echo "--- Checking if .xcresult bundle exists ---"
+          ls -d iosApp/TestResults.xcresult
+
       - name: Run Tests on Firebase Test Lab (Android)
         script: |
           gcloud auth activate-service-account --key-file=./gcloud_key.json
