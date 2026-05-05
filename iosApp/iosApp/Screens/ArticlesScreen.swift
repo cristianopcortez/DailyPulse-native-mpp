@@ -15,6 +15,7 @@ extension ArticlesScreen {
     class ArticlesViewModelWrapper: ObservableObject {
 
         let articlesViewModel: ArticlesViewModel
+        private var stateCollector: CloseableFlowCollector?
 
         init() {
             let vm = ArticlesInjector().articlesViewModel
@@ -25,13 +26,18 @@ extension ArticlesScreen {
         @Published var articlesState: ArticlesState
 
         func startObserving() {
-            Task {
-                for await articlesS in articlesViewModel.articlesState {
-                    if let state = articlesS as? ArticlesState {
-                        self.articlesState = state
-                    }
+            stateCollector?.cancel()
+            stateCollector = articlesViewModel.collectArticlesStateForSwift { [weak self] state in
+                guard let self else { return }
+                Task { @MainActor in
+                    self.articlesState = state
                 }
             }
+        }
+
+        func stopObserving() {
+            stateCollector?.cancel()
+            stateCollector = nil
         }
     }
 }
@@ -63,6 +69,7 @@ struct ArticlesScreen: View {
             self.viewModel.startObserving()
         }
         .onDisappear {
+            self.viewModel.stopObserving()
             self.viewModel.articlesViewModel.clear()
         }
     }

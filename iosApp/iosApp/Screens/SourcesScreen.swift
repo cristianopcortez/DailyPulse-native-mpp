@@ -14,6 +14,8 @@ extension SourcesScreen {
     @MainActor
     class SourcesViewModelWrapper: ObservableObject {
 
+        private var stateCollector: CloseableFlowCollector?
+
         init() {
             let vm = SourcesInjector().sourcesViewModel
             self.viewModel = vm
@@ -25,13 +27,18 @@ extension SourcesScreen {
         @Published var sourcesState: SourcesState
 
         func startObserving() {
-            Task {
-                for await sourcesS in viewModel.sourcesState {
-                    if let state = sourcesS as? SourcesState {
-                        self.sourcesState = state
-                    }
+            stateCollector?.cancel()
+            stateCollector = viewModel.collectSourcesStateForSwift { [weak self] state in
+                guard let self else { return }
+                Task { @MainActor in
+                    self.sourcesState = state
                 }
             }
+        }
+
+        func stopObserving() {
+            stateCollector?.cancel()
+            stateCollector = nil
         }
     }
 }
@@ -68,6 +75,7 @@ struct SourcesScreen: View {
                 self.viewModel.startObserving()
             }
             .onDisappear {
+                self.viewModel.stopObserving()
                 self.viewModel.viewModel.clear()
             }
             .navigationTitle("Sources")
