@@ -57,7 +57,7 @@ workflows:
           
           # 5. Execute both Unit and UI Tests on the simulator
           cd iosApp
-          xcodebuild test \
+          xcodebuild clean test \
             -project iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Debug \
