@@ -92,7 +92,7 @@ workflows:
             --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
             --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait
 
-artifacts:
-  - iosApp/TestMedia/**/*        # Allows viewing images/videos directly in the Codemagic UI
-  - iosApp/TestResults.xcresult  # Optional: keep the full bundle for deep debugging
-  - androidApp/build/outputs/apk/**/*.apk
+    artifacts:
+      - iosApp/TestMedia/**/*        # Allows viewing images/videos directly in the Codemagic UI
+      - iosApp/TestResults.xcresult  # Optional: keep the full bundle for deep debugging
+      - androidApp/build/outputs/apk/**/*.apk
