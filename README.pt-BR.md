@@ -1,6 +1,6 @@
 # DailyPulse — Edição de Portfólio em KMP
 
-**CI (Codemagic):** O pipeline [`kmp-workflow`](./codemagic.yaml) (`KMP Build & Test Lab`) roda em pushes para `main`. [Ver builds →](https://codemagic.io/app/69f8c24fe73167699549e9f5)
+**CI (Codemagic):** [`kmp-workflow`](./codemagic.yaml) em `main` — [visão da pipeline e screenshots](#integração-contínua-codemagic) abaixo.
 
 [Read this in English →](./README.md)
 
@@ -9,6 +9,32 @@
 > 2. **UI Nativa** — Jetpack Compose no Android e SwiftUI no iOS, cada uma consumindo as mesmas ViewModels compartilhadas.
 
 O objetivo desta versão **não é ensinar KMP do zero**; é **mostrar, em um único repositório, os trade-offs arquiteturais entre compartilhar a UI e mantê-la nativa**, reaproveitando 100% da lógica de negócio.
+
+---
+
+## Integração contínua (Codemagic)
+
+Pushes para **`main`** disparam o pipeline [`kmp-workflow`](./codemagic.yaml) (**KMP Build & Test Lab**). A esteira:
+
+- Gera o app Android **mpp** debug e o APK de testes instrumentados
+- Roda testes **iOS** no simulador (unitários + UI, com extração de mídia do XCUITest)
+- Executa testes instrumentados no **Firebase Test Lab** (Android)
+
+As páginas de build no Codemagic exigem login, então os screenshots abaixo documentam a última execução bem-sucedida para quem navega o repositório no GitHub.
+
+### Última execução bem-sucedida (build #25 · `main` · `c349b7f`)
+
+**Visão geral** — concluído em ~12 minutos em Mac mini M2:
+
+![Visão geral do build #25 no Codemagic — finished em main](docs/ci/codemagic-build-overview.png)
+
+**Etapas da pipeline:**
+
+![Etapas do build #25 — Android, iOS, Firebase Test Lab](docs/ci/codemagic-build-steps.png)
+
+**Artefatos publicados** (APKs e pacote de saída da CI):
+
+![Artefatos do build #25 no Codemagic](docs/ci/codemagic-artifacts.png)
 
 ---
 
@@ -25,6 +51,7 @@ Código upstream: [github.com/petros-efthymiou/DailyPulse](https://github.com/pe
 
 ## Sumário
 
+- [Integração contínua (Codemagic)](#integração-contínua-codemagic)
 - [Cursos (Udemy)](#cursos-udemy)
 - [O que é compartilhado, o que é por flavor](#o-que-é-compartilhado-o-que-é-por-flavor)
 - [Build flavors em um relance](#build-flavors-em-um-relance)

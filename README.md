@@ -1,6 +1,6 @@
 # DailyPulse — KMP Portfolio Edition
 
-**CI (Codemagic):** The [`kmp-workflow`](./codemagic.yaml) pipeline (`KMP Build & Test Lab`) runs on pushes to `main`. [View builds →](https://codemagic.io/app/69f8c24fe73167699549e9f5)
+**CI (Codemagic):** [`kmp-workflow`](./codemagic.yaml) on `main` — [pipeline overview & screenshots](#continuous-integration-codemagic) below.
 
 [Read this in Portuguese (PT-BR) →](./README.pt-BR.md)
 
@@ -9,6 +9,32 @@
 > 2. **Native UI** — Jetpack Compose on Android and SwiftUI on iOS, each consuming the same shared ViewModels.
 
 The goal of this fork is not to teach KMP from scratch; it is to **showcase, in one repository, the architectural trade-offs between sharing the UI and keeping it native**, while reusing 100% of the business logic.
+
+---
+
+## Continuous integration (Codemagic)
+
+Pushes to **`main`** trigger the [`kmp-workflow`](./codemagic.yaml) pipeline (**KMP Build & Test Lab**). The workflow:
+
+- Builds the Android **mpp** debug app and its instrumentation test APK
+- Runs **iOS** unit and UI tests on the simulator (with XCUITest media extraction)
+- Runs **Firebase Test Lab** instrumentation on Android
+
+Codemagic build pages require a logged-in account, so the screenshots below document the last successful run for visitors browsing the repo on GitHub.
+
+### Last successful run (build #25 · `main` · `c349b7f`)
+
+**Build overview** — finished in ~12 minutes on a Mac mini M2:
+
+![Codemagic build #25 overview — finished on main](docs/ci/codemagic-build-overview.png)
+
+**Pipeline steps:**
+
+![Codemagic build #25 steps — Android, iOS, Firebase Test Lab](docs/ci/codemagic-build-steps.png)
+
+**Published artifacts** (APKs and bundled CI output):
+
+![Codemagic build #25 artifacts](docs/ci/codemagic-artifacts.png)
 
 ---
 
@@ -25,6 +51,7 @@ Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.co
 
 ## Table of contents
 
+- [Continuous integration (Codemagic)](#continuous-integration-codemagic)
 - [Courses (Udemy)](#courses-udemy)
 - [What is shared, what is per-flavor](#what-is-shared-what-is-per-flavor)
 - [Build flavors at a glance](#build-flavors-at-a-glance)
