@@ -20,13 +20,12 @@ CREATE TABLE Source (
     id TEXT NOT NULL,
     name TEXT NOT NULL,
     desc TEXT NOT NULL,
-    language TEXT NOT NULL,
-    country TEXT NOT NULL
+    origin TEXT NOT NULL
 );
 
 insertSource:
-INSERT INTO Source(id, name, desc, language, country)
-VALUES(?, ?, ?, ?, ?);
+INSERT INTO Source(id, name, desc, origin)
+VALUES(?, ?, ?, ?);
 
 selectAllSources:
 SELECT Source.*

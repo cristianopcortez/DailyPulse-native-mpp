@@ -10,11 +10,13 @@ val networkModule = module {
 
     single<HttpClient> {
         HttpClient {
+            expectSuccess = false
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
                     isLenient = true
                     ignoreUnknownKeys = true
+                    encodeDefaults = true
                 })
             }
         }

@@ -2,7 +2,6 @@ package com.petros.efthymiou.dailypulse.sources.presentation
 
 import com.petros.efthymiou.dailypulse.BaseViewModel
 import com.petros.efthymiou.dailypulse.sources.application.SourcesUseCase
-import com.petros.efthymiou.dailypulse.sources.presentation.SourcesState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -21,11 +20,18 @@ class SourcesViewModel(private val useCase: SourcesUseCase) : BaseViewModel() {
         scope.launch {
             _sourcesState.emit(SourcesState(_sourcesState.value.sources, true, null))
 
-            val sources = useCase.getSources()
-
-            _sourcesState.emit(
-                SourcesState(sources)
-            )
+            try {
+                val sources = useCase.getSources()
+                _sourcesState.emit(SourcesState(sources))
+            } catch (e: Exception) {
+                _sourcesState.emit(
+                    SourcesState(
+                        sources = _sourcesState.value.sources,
+                        loading = false,
+                        error = e.message?.takeIf { it.isNotBlank() } ?: "Unable to load data",
+                    )
+                )
+            }
         }
     }
 }

@@ -9,10 +9,8 @@ data class SourceRaw(
     val id: String,
     @SerialName("name")
     val name: String,
-    @SerialName("description")
+    @SerialName("desc")
     val desc: String,
-    @SerialName("language")
-    val language: String,
-    @SerialName("country")
-    val country: String,
+    @SerialName("origin")
+    val origin: String,
 )

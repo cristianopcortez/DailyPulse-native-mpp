@@ -14,15 +14,13 @@ class SourcesDataSource(private val db: DailyPulseDatabase) {
         id: String,
         name: String,
         desc: String,
-        language: String,
-        country: String
+        origin: String,
     ): SourceRaw {
         return SourceRaw(
-            id,
-            name,
-            desc,
-            language,
-            country
+            id = id,
+            name = name,
+            desc = desc,
+            origin = origin,
         )
     }
 
@@ -39,8 +37,7 @@ class SourcesDataSource(private val db: DailyPulseDatabase) {
             source.id,
             source.name,
             source.desc,
-            source.language,
-            source.country,
+            source.origin,
         )
     }
 }

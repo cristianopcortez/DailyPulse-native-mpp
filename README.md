@@ -58,6 +58,7 @@ Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.co
 - [Project layout](#project-layout)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
+- [Backend (BFF)](#backend-bff)
 - [Running the app](#running-the-app)
   - [Android — `mpp` (Compose Multiplatform)](#android--mpp-compose-multiplatform)
   - [Android — `native` (Jetpack Compose)](#android--native-jetpack-compose)
@@ -159,7 +160,7 @@ DailyPulse/
 |-------|---------|
 | Language | Kotlin 1.9.22, Swift 5 |
 | Async | kotlinx.coroutines, kotlinx.datetime |
-| Networking | Ktor 2.3 (Android engine + Darwin engine) |
+| Networking | Ktor 2.3 (Android engine + Darwin engine) → GraphQL BFF (not NewsAPI) |
 | Persistence | SQLDelight 2.0 |
 | DI | Koin 3.6 (`koin-core`, `koin-android`, `koin-compose`, `koin-androidx-compose`) |
 | UI — `mpp` flavor | Compose Multiplatform 1.6.1, Voyager 1.1, Kamel |
@@ -185,6 +186,22 @@ The pattern is **Clean Architecture + MVI-style state**, with a single `StateFlo
 
 ---
 
+## Backend (BFF)
+
+Articles and Sources are loaded from a **GraphQL BFF** (Ktor), not from NewsAPI in the client. The Android app (and iOS, via `:shared`) posts to `POST /graphql`.
+
+BFF repository: **[github.com/cristianopcortez/daily-pulse-bff](https://github.com/cristianopcortez/daily-pulse-bff)**
+
+Run the BFF locally (`./gradlew run`, port **8080**) before launching the app. Debug defaults: Android emulator `http://10.0.2.2:8080`, iOS Simulator `http://localhost:8080`. Optional machine override in `local.properties` (gitignored):
+
+```properties
+bff.base.url=http://192.168.x.x:8080
+```
+
+About stays fully local on the device.
+
+---
+
 ## Running the app
 
 ### Prerequisites
@@ -193,7 +210,7 @@ The pattern is **Clean Architecture + MVI-style state**, with a single `StateFlo
 - Android Studio Hedgehog (or newer) with the Android SDK 34
 - Xcode 15+ (for the iOS targets)
 - A `local.properties` with `sdk.dir=…`
-- A News API key (the project ships with one for the course; replace as needed)
+- The [Daily Pulse BFF](https://github.com/cristianopcortez/daily-pulse-bff) running locally on port 8080 (see [Backend (BFF)](#backend-bff))
 
 ### Android — `mpp` (Compose Multiplatform)
 

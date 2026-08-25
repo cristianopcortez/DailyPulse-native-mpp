@@ -1,0 +1,14 @@
+ALTER TABLE Source RENAME TO Source_old;
+
+CREATE TABLE Source (
+    id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    desc TEXT NOT NULL,
+    origin TEXT NOT NULL
+);
+
+INSERT INTO Source(id, name, desc, origin)
+SELECT id, name, desc, country || ' - ' || language
+FROM Source_old;
+
+DROP TABLE Source_old;

@@ -16,9 +16,7 @@ class SourcesUseCase(private val repo: SourcesRepository) {
             raw.id,
             raw.name,
             raw.desc,
-            mapOrigin(raw),
+            raw.origin,
         )
     }
-
-    private fun mapOrigin(raw: SourceRaw) = "${raw.country} - ${raw.language}"
 }

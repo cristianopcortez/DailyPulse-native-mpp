@@ -1,19 +1,37 @@
 package com.petros.efthymiou.dailypulse.articles.data
 
-import com.petros.efthymiou.dailypulse.articles.data.ArticleRaw
-import com.petros.efthymiou.dailypulse.articles.data.ArticlesResponse
+import com.petros.efthymiou.dailypulse.network.BffConfig
+import com.petros.efthymiou.dailypulse.network.GraphqlQueries
+import com.petros.efthymiou.dailypulse.network.GraphqlRequest
+import com.petros.efthymiou.dailypulse.network.GraphqlResponse
+import com.petros.efthymiou.dailypulse.network.requireData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class ArticlesService(private val httpClient: HttpClient) {
 
-    private val country = "us"
-    private val category = "business"
-    private val apiKey = "f67ace1b27b24ce4b95c7f71fde88920"
+    suspend fun fetchArticles(source: String? = null): List<ArticleRaw> {
+        val request = GraphqlRequest(
+            query = GraphqlQueries.ARTICLES,
+            variables = if (source == null) {
+                JsonObject(emptyMap())
+            } else {
+                buildJsonObject { put("source", source) }
+            },
+        )
 
-    suspend fun fetchArticles(): List<ArticleRaw> {
-        val response: ArticlesResponse = httpClient.get("https://newsapi.org/v2/top-headlines?country=$country&category=$category&apiKey=$apiKey").body()
-        return response.articles
+        val response: GraphqlResponse<ArticlesGraphqlData> = httpClient.post(BffConfig.graphqlUrl) {
+            contentType(ContentType.Application.Json)
+            setBody(request)
+        }.body()
+
+        return response.requireData().articles
     }
 }

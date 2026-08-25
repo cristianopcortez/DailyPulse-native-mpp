@@ -34,9 +34,9 @@ class ArticlesDataSource(private val database: DailyPulseDatabase) {
         url: String?
     ): ArticleRaw =
         ArticleRaw(
-            title,
-            desc,
-            date,
-            url
+            title = title,
+            desc = desc.orEmpty(),
+            date = date,
+            imageUrl = url.orEmpty(),
         )
 }

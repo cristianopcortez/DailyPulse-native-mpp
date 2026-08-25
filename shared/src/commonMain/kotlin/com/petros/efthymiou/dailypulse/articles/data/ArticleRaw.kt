@@ -7,10 +7,10 @@ import kotlinx.serialization.Serializable
 data class ArticleRaw(
     @SerialName("title")
     val title: String,
-    @SerialName("description")
-    val desc: String?,
-    @SerialName("publishedAt")
+    @SerialName("desc")
+    val desc: String = "",
+    @SerialName("date")
     val date: String,
-    @SerialName("urlToImage")
-    val imageUrl: String?
+    @SerialName("imageUrl")
+    val imageUrl: String = "",
 )
