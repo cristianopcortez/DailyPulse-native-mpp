@@ -64,21 +64,25 @@ Clean dropdown selector accessible from the Articles screen toolbar:
 - Default "newsapi" used if no selection saved
 - Consistent error handling with Articles and Sources features
 
-## Current Limitations (Step 1)
+## Step 2 Implementation - COMPLETED ✅
 
-1. The selected aggregator is **NOT** yet passed to Articles or Sources queries
-2. Articles and Sources continue to use NewsAPI exclusively
-3. The selector only saves the preference for future use
+The selected aggregator is now fully integrated with Articles and Sources queries:
 
-## Next Steps (Step 2)
+1. ✅ GraphQL queries updated to accept `aggregator` parameter
+2. ✅ `ArticlesService.fetchArticles(aggregator, source)` - passes aggregator to BFF
+3. ✅ `SourcesService.fetchSources(aggregator)` - passes aggregator to BFF
+4. ✅ `AggregatorUseCase` injected into ArticlesUseCase and SourcesUseCase
+5. ✅ Selected aggregator ID automatically passed to all queries
+6. ✅ Local caches cleared when aggregator changes
 
-When the BFF supports the `aggregator` argument:
+### Behavior on Aggregator Change
 
-1. Update `ArticlesService.fetchArticles()` to accept and pass `aggregator` parameter
-2. Update `SourcesService.fetchSources()` to accept and pass `aggregator` parameter
-3. Inject `AggregatorUseCase` into Articles and Sources use cases
-4. Read selected aggregator ID and pass to service calls
-5. Clear local caches when aggregator changes
+When user selects a different aggregator:
+1. New aggregator ID is saved to SQLite
+2. Sources cache is cleared (source IDs are provider-specific)
+3. Articles cache is cleared
+4. User returns to Articles screen
+5. Next navigation to Sources or Articles will fetch fresh data with new aggregator
 
 ## API Contract
 

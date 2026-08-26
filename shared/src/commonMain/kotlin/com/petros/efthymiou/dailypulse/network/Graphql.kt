@@ -24,10 +24,10 @@ data class GraphqlError(
 
 object GraphqlQueries {
     const val ARTICLES =
-        "query Articles(\$source: String) { articles(source: \$source) { title desc date imageUrl } }"
+        "query Articles(\$aggregator: String, \$source: String) { articles(aggregator: \$aggregator, source: \$source) { title desc date imageUrl } }"
 
     const val SOURCES =
-        "query Sources { sources { id name desc origin } }"
+        "query Sources(\$aggregator: String) { sources(aggregator: \$aggregator) { id name desc origin } }"
 
     const val AGGREGATORS =
         "query Aggregators { aggregators { id name } }"

@@ -11,13 +11,24 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class SourcesService(private val httpClient: HttpClient) {
 
-    suspend fun fetchSources(): List<SourceRaw> {
+    suspend fun fetchSources(aggregator: String): List<SourceRaw> {
+        val variables = buildJsonObject {
+            put("aggregator", aggregator)
+        }
+
+        val request = GraphqlRequest(
+            query = GraphqlQueries.SOURCES,
+            variables = variables
+        )
+
         val response: GraphqlResponse<SourcesGraphqlData> = httpClient.post(BffConfig.graphqlUrl) {
             contentType(ContentType.Application.Json)
-            setBody(GraphqlRequest(query = GraphqlQueries.SOURCES))
+            setBody(request)
         }.body()
 
         return response.requireData().sources

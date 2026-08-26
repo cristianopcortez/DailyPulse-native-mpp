@@ -1,5 +1,6 @@
 package com.petros.efthymiou.dailypulse.articles.application
 
+import com.petros.efthymiou.dailypulse.aggregators.application.AggregatorUseCase
 import com.petros.efthymiou.dailypulse.articles.data.ArticleRaw
 import com.petros.efthymiou.dailypulse.articles.data.ArticlesRepository
 import kotlinx.datetime.TimeZone
@@ -10,10 +11,14 @@ import kotlin.math.abs
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-class ArticlesUseCase(private val repo: ArticlesRepository) {
+class ArticlesUseCase(
+    private val repo: ArticlesRepository,
+    private val aggregatorUseCase: AggregatorUseCase
+) {
 
     suspend fun getArticles(forceFetch: Boolean): List<Article> {
-        val articlesRaw = repo.getArticles(forceFetch)
+        val selectedAggregator = aggregatorUseCase.getSelectedAggregatorId()
+        val articlesRaw = repo.getArticles(selectedAggregator, forceFetch)
         return mapArticles(articlesRaw)
     }
 

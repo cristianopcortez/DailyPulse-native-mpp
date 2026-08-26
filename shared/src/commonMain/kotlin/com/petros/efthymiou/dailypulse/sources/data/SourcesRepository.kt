@@ -5,14 +5,18 @@ class SourcesRepository(
     private val service: SourcesService
 ) {
 
-    suspend fun getAllSources(): List<SourceRaw> {
+    suspend fun getAllSources(aggregator: String): List<SourceRaw> {
         val sourcesDb = dataSource.getAllSources()
         if (sourcesDb.isEmpty()) {
             dataSource.clearSources()
-            val fetchedSources = service.fetchSources()
+            val fetchedSources = service.fetchSources(aggregator)
             dataSource.createSources(fetchedSources)
             return fetchedSources
         }
         return sourcesDb
+    }
+
+    fun clearSources() {
+        dataSource.clearSources()
     }
 }

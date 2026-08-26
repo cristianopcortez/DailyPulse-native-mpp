@@ -10,7 +10,7 @@ import com.petros.efthymiou.dailypulse.sources.presentation.SourcesViewModel
 val sourcesModule = module {
 
     single<SourcesService> { SourcesService(get()) }
-    single<SourcesUseCase> { SourcesUseCase(get()) }
+    single<SourcesUseCase> { SourcesUseCase(get(), get()) }
     single<SourcesDataSource> { SourcesDataSource(get()) }
     single<SourcesRepository> { SourcesRepository(get(), get()) }
     single<SourcesViewModel> { SourcesViewModel(get()) }

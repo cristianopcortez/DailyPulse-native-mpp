@@ -12,5 +12,5 @@ val aggregatorModule = module {
     single<AggregatorSettings> { AggregatorSettings(get()) }
     single<AggregatorRepository> { AggregatorRepository(get(), get()) }
     single<AggregatorUseCase> { AggregatorUseCase(get()) }
-    single<AggregatorViewModel> { AggregatorViewModel(get()) }
+    single<AggregatorViewModel> { AggregatorViewModel(get(), get(), get()) }
 }

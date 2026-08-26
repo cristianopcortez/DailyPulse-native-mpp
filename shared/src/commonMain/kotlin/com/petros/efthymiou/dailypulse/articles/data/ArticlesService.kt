@@ -17,14 +17,15 @@ import kotlinx.serialization.json.put
 
 class ArticlesService(private val httpClient: HttpClient) {
 
-    suspend fun fetchArticles(source: String? = null): List<ArticleRaw> {
+    suspend fun fetchArticles(aggregator: String, source: String? = null): List<ArticleRaw> {
+        val variables = buildJsonObject {
+            put("aggregator", aggregator)
+            source?.let { put("source", it) }
+        }
+
         val request = GraphqlRequest(
             query = GraphqlQueries.ARTICLES,
-            variables = if (source == null) {
-                JsonObject(emptyMap())
-            } else {
-                buildJsonObject { put("source", source) }
-            },
+            variables = variables,
         )
 
         val response: GraphqlResponse<ArticlesGraphqlData> = httpClient.post(BffConfig.graphqlUrl) {

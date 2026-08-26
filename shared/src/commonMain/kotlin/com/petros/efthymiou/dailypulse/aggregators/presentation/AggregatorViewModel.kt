@@ -2,12 +2,16 @@ package com.petros.efthymiou.dailypulse.aggregators.presentation
 
 import com.petros.efthymiou.dailypulse.BaseViewModel
 import com.petros.efthymiou.dailypulse.aggregators.application.AggregatorUseCase
+import com.petros.efthymiou.dailypulse.articles.data.ArticlesDataSource
+import com.petros.efthymiou.dailypulse.sources.application.SourcesUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class AggregatorViewModel(
-    private val useCase: AggregatorUseCase
+    private val useCase: AggregatorUseCase,
+    private val sourcesUseCase: SourcesUseCase,
+    private val articlesDataSource: ArticlesDataSource
 ) : BaseViewModel() {
 
     private val _aggregatorState: MutableStateFlow<AggregatorState> =
@@ -44,7 +48,14 @@ class AggregatorViewModel(
     }
 
     fun selectAggregator(aggregatorId: String) {
-        useCase.selectAggregator(aggregatorId)
-        _aggregatorState.value = _aggregatorState.value.copy(selectedAggregatorId = aggregatorId)
+        val currentId = _aggregatorState.value.selectedAggregatorId
+        
+        if (currentId != aggregatorId) {
+            useCase.selectAggregator(aggregatorId)
+            _aggregatorState.value = _aggregatorState.value.copy(selectedAggregatorId = aggregatorId)
+            
+            sourcesUseCase.clearSources()
+            articlesDataSource.clearArticles()
+        }
     }
 }
