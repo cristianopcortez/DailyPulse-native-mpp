@@ -33,3 +33,18 @@ FROM Source;
 
 removeAllSources:
 DELETE FROM Source;
+
+CREATE TABLE AggregatorSetting (
+    id INTEGER NOT NULL PRIMARY KEY DEFAULT 1,
+    selectedAggregatorId TEXT NOT NULL,
+    CHECK (id = 1)
+);
+
+insertOrReplaceAggregatorSetting:
+INSERT OR REPLACE INTO AggregatorSetting(id, selectedAggregatorId)
+VALUES(1, ?);
+
+selectAggregatorSetting:
+SELECT AggregatorSetting.*
+FROM AggregatorSetting
+WHERE id = 1;

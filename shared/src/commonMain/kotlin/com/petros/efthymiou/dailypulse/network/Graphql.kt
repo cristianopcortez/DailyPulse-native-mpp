@@ -28,6 +28,9 @@ object GraphqlQueries {
 
     const val SOURCES =
         "query Sources { sources { id name desc origin } }"
+
+    const val AGGREGATORS =
+        "query Aggregators { aggregators { id name } }"
 }
 
 fun <T> GraphqlResponse<T>.requireData(): T {

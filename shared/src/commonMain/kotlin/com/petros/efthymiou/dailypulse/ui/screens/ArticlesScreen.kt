@@ -14,6 +14,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -76,6 +77,14 @@ private fun AppBar() {
     TopAppBar(
         title = { Text(text = "Articles") },
         actions = {
+            IconButton(onClick = {
+                navigator.push(AggregatorScreen())
+            }) {
+                Icon(
+                    imageVector = Icons.Outlined.Settings,
+                    contentDescription = "News Provider Button",
+                )
+            }
             IconButton(onClick = {
                 navigator.push(SourcesScreen())
             }) {
