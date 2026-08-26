@@ -68,7 +68,7 @@ compose-material = { module = "org.jetbrains.compose.material:material", version
 compose-material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "materialIconsMultiplatform" }
 material-icons-core-android = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsAndroid" }
 
-kamel-image = { module = "media.kamel:kamel-image", version.ref = "kamelImage" }
+kamel-image = { module = "media.kamel:kamel-image-default", version.ref = "kamelImage" }
 
 
 

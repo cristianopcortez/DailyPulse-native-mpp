@@ -133,7 +133,9 @@ fun ArticleItemView(article: Article) {
             resource = asyncPainterResource(data = Url(article.imageUrl)),
             contentDescription = "article image",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.height(200.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp),
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
