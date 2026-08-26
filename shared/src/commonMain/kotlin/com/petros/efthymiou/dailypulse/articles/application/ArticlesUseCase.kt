@@ -2,13 +2,13 @@ package com.petros.efthymiou.dailypulse.articles.application
 
 import com.petros.efthymiou.dailypulse.articles.data.ArticleRaw
 import com.petros.efthymiou.dailypulse.articles.data.ArticlesRepository
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import kotlin.math.abs
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 class ArticlesUseCase(private val repo: ArticlesRepository) {
 

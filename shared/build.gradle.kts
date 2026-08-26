@@ -1,10 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.File
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
-    kotlin("plugin.serialization") version "1.9.20"
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.sqlDelight)
     alias(libs.plugins.composeMultiplatformPlugin)
 }
@@ -77,30 +79,39 @@ val generateBffConfig by tasks.registering {
     }
 }
 
-@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
+// iOS targets only on macOS. Declaring them on Windows makes Android Studio run
+// transformNativeMainCInteropDependenciesMetadataForIde, which currently NPEs
+// during Gradle sync (path == null) and leaves commonMain unresolved.
+val isMacOs = System.getProperty("os.name").orEmpty().startsWith("Mac", ignoreCase = true)
+
 kotlin {
-    targetHierarchy.default()
+    compilerOptions {
+        // expect/actual classes are still Beta in K2; this flag is required so
+        // Platform and BaseViewModel pair correctly instead of failing analysis.
+        freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
 
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "1.8"
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            freeCompilerArgs.add("-Xexpect-actual-classes")
+        }
+    }
+
+    if (isMacOs) {
+        listOf(
+            iosX64(),
+            iosArm64(),
+            iosSimulatorArm64()
+        ).forEach {
+            it.binaries.framework {
+                baseName = "shared"
             }
         }
     }
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
-            baseName = "shared"
-        }
-    }
-
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.ktor.client.core)
@@ -115,6 +126,7 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation(compose.material3)
                 implementation(libs.compose.material)
+                implementation(libs.compose.material.icons.core)
                 implementation(libs.koin.compose)
                 implementation(libs.kamel.image)
                 implementation(libs.voyager.navigator)
@@ -122,7 +134,7 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
+        androidMain {
             kotlin.srcDir(bffConfigOutputDir)
             dependencies {
                 implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -131,15 +143,26 @@ kotlin {
             }
         }
 
-        val iosMain by getting {
-            kotlin.srcDir(bffConfigOutputDir)
-            dependencies {
-                implementation(libs.ktor.client.darwin)
-                implementation(libs.sql.native.driver)
+        if (isMacOs) {
+            iosMain {
+                kotlin.srcDir(bffConfigOutputDir)
+                dependencies {
+                    implementation(libs.ktor.client.darwin)
+                    implementation(libs.sql.native.driver)
+                }
             }
+        } else {
+            // Windows/Linux hosts omit iOS targets (see isMacOs above). Without an
+            // iosMain source set, Android Studio folds src/iosMain into the Android
+            // `main` compilation, and K2 reports expect/actual in the same module.
+            val iosMain by creating {
+                dependsOn(getByName("commonMain"))
+                kotlin.srcDir("src/iosMain/kotlin")
+            }
+            iosMain.kotlin.srcDir(bffConfigOutputDir)
         }
 
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.kotlin.test)
             }
@@ -153,9 +176,13 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool<*>>()
 
 android {
     namespace = "com.petros.efthymiou.dailypulse"
-    compileSdk = 34
+    compileSdk = 36
     defaultConfig {
         minSdk = 24
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

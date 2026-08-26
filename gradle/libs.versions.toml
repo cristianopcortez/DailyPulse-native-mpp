@@ -1,23 +1,27 @@
 [versions]
-agp = "8.2.2"
-coilCompose = "2.5.0"
-kotlin = "1.9.22"
-compose = "1.5.1"
-compose-compiler = "1.5.3"
-compose-material3 = "1.2.1"
-androidx-activityCompose = "1.7.2"
-kotlinxCoroutinesCore = "1.7.3"
-lifecycleViewmodelKtx = "2.6.2"
-navigationCompose = "2.7.5"
-ktorClient = "2.3.5"
-kotlinxDatetime = "0.4.1"
-koin = "3.6.0-wasm-alpha2"
-koinAndroidxCompose = "3.5.3"
-sqlDelight = "2.0.1"
-composeMultiplatform = "1.6.1"
-koinCompose = "1.1.2"
-kamelImage = "0.9.4"
-voyagerVersion = "1.1.0-alpha04"
+agp = "8.13.2"
+coilCompose = "2.7.0"
+kotlin = "2.4.10"
+# androidx compose 1.12 and lifecycle 2.11 require AGP 9.1 and compileSdk 37, so this
+# project stays one generation back while it is on the AGP 8 line.
+compose = "1.11.0"
+compose-material3 = "1.4.0"
+androidx-activityCompose = "1.13.0"
+kotlinxCoroutinesCore = "1.11.0"
+lifecycleViewmodelKtx = "2.10.0"
+navigationCompose = "2.9.8"
+ktorClient = "3.5.2"
+kotlinxDatetime = "0.8.0"
+koin = "4.2.2"
+sqlDelight = "2.3.2"
+composeMultiplatform = "1.11.1"
+kamelImage = "1.0.9"
+voyagerVersion = "2.2.21-1.10.3"
+# Material Icons are end-of-life: Google stopped publishing them and removed them from
+# material3. JetBrains pins the multiplatform artifact at 1.7.3. Kept to avoid redesigning
+# the toolbars; the forward path is Material Symbols vector drawables.
+materialIconsMultiplatform = "1.7.3"
+materialIconsAndroid = "1.7.8"
 androidx-test-junit = "1.1.5"
 androidx-test-core = "1.6.1"
 androidx-test-runner = "1.6.2"
@@ -46,9 +50,9 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClient" }
 
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinAndroidxCompose" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -61,6 +65,8 @@ sql-native-driver = { module = "app.cash.sqldelight:native-driver", version.ref 
 sql-android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
 
 compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "composeMultiplatform" }
+compose-material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "materialIconsMultiplatform" }
+material-icons-core-android = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsAndroid" }
 
 kamel-image = { module = "media.kamel:kamel-image", version.ref = "kamelImage" }
 
@@ -71,8 +77,9 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+# Since Kotlin 2.0 the Compose compiler ships as a Kotlin plugin and must match the Kotlin version.
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 sqlDelight = { id = "app.cash.sqldelight", version.ref = "sqlDelight" }
 
 composeMultiplatformPlugin = { id= "org.jetbrains.compose", version.ref = "composeMultiplatform" }
-
-

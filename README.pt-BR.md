@@ -158,13 +158,14 @@ DailyPulse/
 
 | Camada | Biblioteca |
 |--------|------------|
-| Linguagem | Kotlin 1.9.22, Swift 5 |
-| Async | kotlinx.coroutines, kotlinx.datetime |
-| Networking | Ktor 2.3 (engine Android + engine Darwin) → BFF GraphQL (não a NewsAPI) |
-| Persistência | SQLDelight 2.0 |
-| Injeção de dependências | Koin 3.6 (`koin-core`, `koin-android`, `koin-compose`, `koin-androidx-compose`) |
-| UI — flavor `mpp` | Compose Multiplatform 1.6.1, Voyager 1.1, Kamel |
-| UI — flavor `native` (Android) | Jetpack Compose (Material 3 1.2.1), `androidx.navigation.compose`, Coil |
+| Build | Gradle 9.5.1, AGP 8.13.2, JDK 17 |
+| Linguagem | Kotlin 2.4.10 (K2), Swift 5 |
+| Async | kotlinx.coroutines 1.11, kotlinx.datetime 0.8 (`kotlin.time`) |
+| Networking | Ktor 3.5 (engine Android + engine Darwin) → BFF GraphQL (não a NewsAPI) |
+| Persistência | SQLDelight 2.3 |
+| Injeção de dependências | Koin 4.2 (`koin-core`, `koin-android`, `koin-compose`, `koin-androidx-compose`) |
+| UI — flavor `mpp` | Compose Multiplatform 1.11.1, Voyager 2.2, Kamel 1.0 |
+| UI — flavor `native` (Android) | Jetpack Compose (Material 3 1.4.0), `androidx.navigation.compose`, Coil |
 | UI — flavor `native` (iOS) | SwiftUI, `NavigationStack`, `AsyncImage` |
 
 ---

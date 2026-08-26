@@ -1,16 +1,17 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeMultiplatformPlugin)
 }
 
 android {
     namespace = "com.petros.efthymiou.dailypulse.android"
-    compileSdk = 34
+    compileSdk = 36
     defaultConfig {
         applicationId = "com.petros.efthymiou.dailypulse.android"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -18,9 +19,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     packaging {
         resources {
@@ -33,11 +31,13 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -86,6 +86,7 @@ dependencies {
     "nativeImplementation"(libs.coil.compose)
     "nativeImplementation"(libs.koin.androidx.compose)
     "nativeImplementation"(libs.material.compose.android) // androidx.compose.material (pullrefresh)
+    "nativeImplementation"(libs.material.icons.core.android) // material3 no longer ships Material Icons
 
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)

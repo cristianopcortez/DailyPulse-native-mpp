@@ -5,7 +5,9 @@ import android.os.Build
 import android.util.Log
 import kotlin.math.round
 
-actual class Platform() {
+actual class Platform {
+    actual constructor()
+
     actual val osName: String
         get() = "Android"
     actual val osVersion: String

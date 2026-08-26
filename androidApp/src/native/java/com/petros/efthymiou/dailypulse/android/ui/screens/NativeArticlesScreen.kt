@@ -11,8 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -70,7 +70,7 @@ private fun ArticlesAppBar(
         title = { Text(text = "Articles") },
         actions = {
             IconButton(onClick = onSourcesClick) {
-                Icon(imageVector = Icons.Filled.List, contentDescription = "Sources")
+                Icon(imageVector = Icons.AutoMirrored.Filled.List, contentDescription = "Sources")
             }
             IconButton(onClick = onAboutClick) {
                 Icon(imageVector = Icons.Filled.Info, contentDescription = "About Device")

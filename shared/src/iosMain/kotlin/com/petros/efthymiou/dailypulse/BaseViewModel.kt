@@ -6,6 +6,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.cancel
 
 actual open class BaseViewModel {
+    actual constructor()
 
     actual val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 

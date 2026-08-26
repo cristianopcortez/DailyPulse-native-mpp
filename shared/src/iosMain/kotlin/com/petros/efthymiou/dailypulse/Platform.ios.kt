@@ -4,7 +4,9 @@ import platform.Foundation.NSLog
 import platform.UIKit.UIDevice
 import platform.UIKit.UIScreen
 
-actual class Platform() {
+actual class Platform {
+    actual constructor()
+
     actual val osName: String
         get() = UIDevice.currentDevice.systemName
     actual val osVersion: String

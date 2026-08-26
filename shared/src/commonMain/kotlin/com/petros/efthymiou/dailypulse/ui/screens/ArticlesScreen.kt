@@ -12,8 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -24,13 +24,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -56,15 +56,15 @@ class ArticlesScreen : Screen {
 fun ArticlesScreenContent(
     articlesViewModel: ArticlesViewModel = koinInject(),
 ) {
-    val articlesState = articlesViewModel.articlesState.collectAsState()
+    val articlesState by articlesViewModel.articlesState.collectAsState()
 
     Column {
         AppBar()
 
-        if (articlesState.value.error != null)
-            ErrorMessage(articlesState.value.error!!)
-        if (articlesState.value.articles.isNotEmpty())
-            ArticlesListView(articlesViewModel)
+        articlesState.error?.let { ErrorMessage(it) }
+        if (articlesState.articles.isNotEmpty()) {
+            ArticlesListView(viewModel = articlesViewModel)
+        }
     }
 }
 
@@ -80,7 +80,7 @@ private fun AppBar() {
                 navigator.push(SourcesScreen())
             }) {
                 Icon(
-                    imageVector = Icons.Outlined.List,
+                    imageVector = Icons.AutoMirrored.Outlined.List,
                     contentDescription = "Sources Button",
                 )
             }
@@ -99,23 +99,23 @@ private fun AppBar() {
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun ArticlesListView(viewModel: ArticlesViewModel) {
-
-    val state = rememberPullRefreshState(
-        refreshing = viewModel.articlesState.value.loading,
+    val articlesState by viewModel.articlesState.collectAsState()
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = articlesState.loading,
         onRefresh = { viewModel.getArticles(true) }
     )
 
     Box(
-        modifier = Modifier.pullRefresh(state = state)
+        modifier = Modifier.pullRefresh(state = pullRefreshState)
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(viewModel.articlesState.value.articles) { article ->
+            items(articlesState.articles) { article ->
                 ArticleItemView(article = article)
             }
         }
         PullRefreshIndicator(
-            refreshing = viewModel.articlesState.value.loading,
-            state = state,
+            refreshing = articlesState.loading,
+            state = pullRefreshState,
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
