@@ -2,6 +2,7 @@ package com.petros.efthymiou.dailypulse.articles.presentation
 
 import com.petros.efthymiou.dailypulse.BaseViewModel
 import com.petros.efthymiou.dailypulse.articles.application.ArticlesUseCase
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -26,6 +27,8 @@ class ArticlesViewModel(
             try {
                 val fetchedArticles = useCase.getArticles(forceFetch)
                 _articlesState.emit(ArticlesState(articles = fetchedArticles))
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _articlesState.emit(
                     ArticlesState(

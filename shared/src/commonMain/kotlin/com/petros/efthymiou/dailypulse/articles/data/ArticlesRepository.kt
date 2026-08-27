@@ -6,24 +6,20 @@ class ArticlesRepository(
 ) {
 
     suspend fun getArticles(aggregator: String, forceFetch: Boolean): List<ArticleRaw> {
-        if (forceFetch) {
-            dataSource.clearArticles()
-            return fetchArticles(aggregator)
+        if (!forceFetch) {
+            val articlesDb = dataSource.getAllArticles()
+            println("Got ${articlesDb.size} from the database!!")
+            if (articlesDb.isNotEmpty()) {
+                return articlesDb
+            }
         }
 
-        val articlesDb = dataSource.getAllArticles()
-        println("Got ${articlesDb.size} from the database!!")
-
-        if (articlesDb.isEmpty()) {
-            return fetchArticles(aggregator)
-        }
-
-        return articlesDb
+        return fetchArticles(aggregator)
     }
 
     private suspend fun fetchArticles(aggregator: String): List<ArticleRaw> {
         val fetchedArticles = service.fetchArticles(aggregator)
-        dataSource.insertArticles(fetchedArticles)
+        dataSource.replaceArticles(fetchedArticles)
         return fetchedArticles
     }
 }

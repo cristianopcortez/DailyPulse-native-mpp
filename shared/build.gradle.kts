@@ -138,7 +138,7 @@ kotlin {
             kotlin.srcDir(bffConfigOutputDir)
             dependencies {
                 implementation(libs.androidx.lifecycle.viewmodel.ktx)
-                implementation(libs.ktor.client.android)
+                implementation(libs.ktor.client.okhttp)
                 implementation(libs.sql.android.driver)
             }
         }

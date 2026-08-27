@@ -18,6 +18,7 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,8 +64,18 @@ fun ArticlesScreenContent(
         AppBar()
 
         articlesState.error?.let { ErrorMessage(it) }
-        if (articlesState.articles.isNotEmpty()) {
-            ArticlesListView(viewModel = articlesViewModel)
+        when {
+            articlesState.loading && articlesState.articles.isEmpty() -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            articlesState.articles.isNotEmpty() -> {
+                ArticlesListView(viewModel = articlesViewModel)
+            }
         }
     }
 }
@@ -138,14 +149,17 @@ fun ArticleItemView(article: Article) {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        KamelImage(
-            resource = asyncPainterResource(data = Url(article.imageUrl)),
-            contentDescription = "article image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-        )
+        if (article.imageUrl.isNotBlank()) {
+            KamelImage(
+                resource = asyncPainterResource(data = Url(article.imageUrl)),
+                contentDescription = "article image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
+                onFailure = { },
+            )
+        }
         Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = article.title,

@@ -34,17 +34,20 @@ class ArticlesUseCase(
     }
 
     private fun getDaysAgoString(date: String): String {
+        val instant = parseInstant(date) ?: return date
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         val days = today.daysUntil(
-            Instant.parse(date).toLocalDateTime(TimeZone.currentSystemDefault()).date
+            instant.toLocalDateTime(TimeZone.currentSystemDefault()).date
         )
 
-        val result = when {
+        return when {
             abs(days) > 1 -> "${abs(days)} days ago"
             abs(days) == 1 -> "Yesterday"
             else -> "Today"
         }
-
-        return result
     }
+
+    private fun parseInstant(date: String): Instant? =
+        runCatching { Instant.parse(date) }.getOrNull()
+            ?: runCatching { Instant.parse("${date}Z") }.getOrNull()
 }
