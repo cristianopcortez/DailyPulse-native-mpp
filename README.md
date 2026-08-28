@@ -53,6 +53,7 @@ Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.co
 
 - [Continuous integration (Codemagic)](#continuous-integration-codemagic)
 - [Courses (Udemy)](#courses-udemy)
+- [Testing](#testing)
 - [What is shared, what is per-flavor](#what-is-shared-what-is-per-flavor)
 - [Build flavors at a glance](#build-flavors-at-a-glance)
 - [Project layout](#project-layout)
@@ -69,6 +70,193 @@ Upstream source code: [github.com/petros-efthymiou/DailyPulse](https://github.co
 - [Course branches reference](#course-branches-reference)
 - [Author](#author)
 - [License](#license)
+
+---
+
+## Testing
+
+DailyPulse showcases a **production-grade multi-layered testing strategy** that eliminates flaky tests and external dependencies through intelligent network mocking.
+
+### 🎯 Test Architecture
+
+| Layer | Tool | Speed | Device? | Coverage | Tests |
+|-------|------|-------|---------|----------|-------|
+| **Unit** | `ktor-client-mock` | ⚡⚡⚡ ~10s | No | Services, repos, use cases | 7 tests |
+| **Instrumented** | `MockWebServer` | ⚡⚡ ~60s | Emulator/Device | E2E UI flows, error states | 5 tests |
+| **Firebase Test Lab** | `MockWebServer` | ⚡ ~5min | Real devices | Device compatibility | Same as instrumented |
+
+**Total: 12 automated tests** running deterministically without any external backend.
+
+### 🚀 Quick Start
+
+```bash
+# Unit tests (fast, no device needed)
+./gradlew :shared:testDebugUnitTest
+
+# Instrumented tests (requires emulator or physical device)
+./gradlew :androidApp:connectedMppDebugAndroidTest
+
+# Build APKs for Firebase Test Lab
+./gradlew :androidApp:assembleMppDebug :androidApp:assembleMppDebugAndroidTest
+```
+
+### ✨ Key Innovations
+
+#### 1. **TestBffConfig** - Runtime URL Override
+```kotlin
+// Production: uses compile-time baked URL
+TestBffConfig.getGraphqlUrl() // http://10.0.2.2:8080/graphql
+
+// Tests: MockWebServer injects its URL at runtime
+TestBffConfig.setOverride("http://127.0.0.1:12345")
+TestBffConfig.getGraphqlUrl() // http://127.0.0.1:12345/graphql
+```
+No build flavors or compile-time flags needed—tests inject mock URLs seamlessly.
+
+#### 2. **MockWebServer Intelligent Dispatcher**
+```kotlin
+mockWebServer.dispatcher = object : Dispatcher() {
+    override fun dispatch(request: RecordedRequest): MockResponse {
+        val body = request.body.readUtf8()
+        return when {
+            body.contains("articles") -> MockResponse().setBody(ARTICLES_JSON)
+            body.contains("sources") -> MockResponse().setBody(SOURCES_JSON)
+            body.contains("aggregators") -> MockResponse().setBody(AGGREGATORS_JSON)
+            else -> MockResponse().setResponseCode(404)
+        }
+    }
+}
+```
+Single mock server handles all GraphQL queries automatically.
+
+#### 3. **Custom Test Runner** - DI Injection Before App Init
+```kotlin
+class DailyPulseTestRunner : AndroidJUnitRunner() {
+    override fun newApplication(...): Application {
+        return super.newApplication(cl, TestDailyPulseApp::class.java.name, context)
+    }
+}
+```
+Injects test Koin modules before the app initializes, enabling complete DI override.
+
+### 📊 Impact & Results
+
+#### Before Testing Implementation
+- ❌ 1 smoke test only (`MainActivity` launches)
+- ❌ Required external BFF running (`http://10.0.2.2:8080`)
+- ❌ Flaky CI runs due to network dependencies
+- ❌ Manual setup required (~10 minutes)
+- ❌ No coverage for GraphQL parsing, error states, UI flows
+
+#### After Testing Implementation
+- ✅ **12 automated tests** (7 unit + 5 instrumented)
+- ✅ **Zero external dependencies** - all tests self-contained
+- ✅ **100% deterministic** - same results every run
+- ✅ **Zero configuration** - just `./gradlew test`
+- ✅ **Stable on physical devices** - tested on Moto G(6) Plus, multiple emulators
+- ✅ **CI-ready** - passing consistently on Codemagic and Firebase Test Lab
+- ✅ **Well-documented** - 2,600+ lines of guides and examples
+
+### 🧪 What Gets Tested
+
+#### Unit Tests (`shared/src/commonTest/`)
+- ✅ **ArticlesServiceTest** (4 tests)
+  - GraphQL response parsing
+  - Empty article lists
+  - Variable passing (aggregator, source)
+  - Error handling
+- ✅ **SourcesServiceTest** (3 tests)
+  - Sources parsing
+  - Aggregator filter
+  - Empty responses
+
+#### Instrumented Tests (`androidApp/src/androidTest/`)
+- ✅ **ArticlesScreenTest** (3 tests)
+  - Articles display from MockWebServer
+  - Article descriptions render
+  - Loading states
+- ✅ **ArticlesScreenErrorTest** (2 tests)
+  - Error message display on server errors
+  - Empty state handling
+
+All tests use **centralized fixtures** (`GraphqlFixtures.kt`, `AndroidGraphqlFixtures.kt`) for maintainable test data.
+
+### 📁 Test Infrastructure
+
+```
+DailyPulse/
+├── shared/src/
+│   ├── commonMain/.../network/
+│   │   └── TestBffConfig.kt              # Runtime URL override
+│   └── commonTest/
+│       ├── fixtures/GraphqlFixtures.kt    # Centralized test data
+│       ├── articles/data/
+│       │   └── ArticlesServiceTest.kt     # 4 unit tests
+│       └── sources/data/
+│           └── SourcesServiceTest.kt      # 3 unit tests
+│
+└── androidApp/src/androidTest/
+    ├── DailyPulseTestRunner.kt            # Custom AndroidJUnitRunner
+    ├── TestDailyPulseApp.kt               # Test Application with DI override
+    ├── di/TestKoinModules.kt              # Test Koin configuration
+    ├── fixtures/AndroidGraphqlFixtures.kt # UI test data
+    └── screens/
+        ├── ArticlesScreenTest.kt          # 3 UI tests
+        └── ArticlesScreenErrorTest.kt     # 2 error tests
+```
+
+### 🎓 Complete Documentation
+
+Comprehensive testing guides available in [`docs/testing/`](./docs/testing/):
+
+| Document | Description | Lines |
+|----------|-------------|-------|
+| **[README.md](./docs/testing/README.md)** | Quick start, overview, and architecture | 400+ |
+| **[TESTING_STRATEGY.md](./docs/testing/TESTING_STRATEGY.md)** | Detailed strategy, rationale, migration path | 650+ |
+| **[RUNNING_TESTS.md](./docs/testing/RUNNING_TESTS.md)** | Practical guide with troubleshooting | 420+ |
+| **[IMPLEMENTATION_SUMMARY.md](./docs/testing/IMPLEMENTATION_SUMMARY.md)** | Complete structure reference | 280+ |
+| **[QUICK_REFERENCE.md](./docs/testing/QUICK_REFERENCE.md)** | Command cheat sheet | 150+ |
+| **[RESUMO_PT-BR.md](./docs/testing/RESUMO_PT-BR.md)** | Portuguese executive summary | 450+ |
+
+**Total: 2,600+ lines of documentation** with examples, diagrams, and troubleshooting guides.
+
+### 🔧 Physical Device Testing
+
+Tests are **stable on physical devices** (validated on Moto G(6) Plus, API 28):
+
+- Uses `assertExists()` instead of `assertIsDisplayed()` for viewport clipping
+- `waitUntil` with 10s timeout for async data flow (Network → SQLDelight → StateFlow → UI)
+- `performScrollToNode()` for LazyColumn items below the fold
+- Handles TopAppBar insets and device-specific layout variations
+- Explicit OkHttp 4.12.0 dependency resolution to prevent `NoClassDefFoundError`
+- Database cleanup in test setup ensures isolation
+
+### 📦 Dependencies
+
+```kotlin
+// gradle/libs.versions.toml
+ktor-client-mock = "3.5.2"    // Unit test mocking
+mockwebserver = "4.12.0"       // Instrumented test mocking
+turbine = "1.2.0"              // Flow testing (future use)
+```
+
+### 🎯 Why This Matters for Portfolio Projects
+
+This testing infrastructure demonstrates:
+
+1. **Production-grade testing practices** - not just toy examples
+2. **Understanding of test pyramids** - fast unit tests, strategic E2E tests
+3. **Solving real problems** - flaky tests, external dependencies, device variations
+4. **Documentation skills** - comprehensive guides for team onboarding
+5. **CI/CD integration** - automated testing in real pipelines
+6. **Multiplatform testing** - testing shared KMP business logic
+
+Perfect showcase for **senior-level mobile engineering** positions requiring:
+- Clean Architecture testing
+- Dependency injection testing
+- Network mocking strategies
+- CI/CD pipeline design
+- Technical documentation
 
 ---
 

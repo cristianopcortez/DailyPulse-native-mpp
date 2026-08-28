@@ -14,7 +14,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.petros.efthymiou.dailypulse.android.DailyPulseTestRunner"
     }
     buildFeatures {
         compose = true
@@ -62,6 +62,14 @@ android {
     }
 }
 
+// Force OkHttp version to avoid conflicts between Ktor engine and MockWebServer
+configurations.all {
+    resolutionStrategy {
+        force("com.squareup.okhttp3:okhttp:4.12.0")
+        force("com.squareup.okhttp3:mockwebserver:4.12.0")
+    }
+}
+
 dependencies {
     implementation(projects.shared)
 
@@ -91,4 +99,19 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.okhttp)
+    androidTestImplementation(libs.mockwebserver)
+    androidTestImplementation(libs.koin.android)
+    
+    androidTestImplementation(libs.ktor.client.core)
+    androidTestImplementation(libs.ktor.client.content.negotiation)
+    androidTestImplementation(libs.ktor.serialization.kotlinx.json)
+    androidTestImplementation(libs.ktor.client.okhttp)
+    
+    androidTestImplementation(libs.compose.ui)
+    androidTestImplementation(libs.compose.material3)
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.11.0")
+    
+    debugImplementation(libs.okhttp)
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.11.0")
 }

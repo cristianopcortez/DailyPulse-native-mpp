@@ -1,6 +1,7 @@
 package com.petros.efthymiou.dailypulse.articles.data
 
 import com.petros.efthymiou.dailypulse.network.BffConfig
+import com.petros.efthymiou.dailypulse.network.TestBffConfig
 import com.petros.efthymiou.dailypulse.network.GraphqlQueries
 import com.petros.efthymiou.dailypulse.network.GraphqlRequest
 import com.petros.efthymiou.dailypulse.network.GraphqlResponse
@@ -28,7 +29,7 @@ class ArticlesService(private val httpClient: HttpClient) {
             variables = variables,
         )
 
-        val response: GraphqlResponse<ArticlesGraphqlData> = httpClient.post(BffConfig.graphqlUrl) {
+        val response: GraphqlResponse<ArticlesGraphqlData> = httpClient.post(TestBffConfig.getGraphqlUrl()) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }.body()
