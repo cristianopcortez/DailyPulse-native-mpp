@@ -9,6 +9,11 @@
 # Instrumented tests (60s, needs emulator)
 ./gradlew :androidApp:connectedMppDebugAndroidTest
 
+# iOS UI tests (needs Mac / Codemagic simulator)
+cd iosApp && xcodebuild test -project iosApp.xcodeproj -scheme iosApp \
+  -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+  CODE_SIGNING_ALLOWED=NO
+
 # Build for Firebase Test Lab
 ./gradlew :androidApp:assembleMppDebug :androidApp:assembleMppDebugAndroidTest
 ```
@@ -18,7 +23,8 @@
 ```
 Test Code:
 ├── shared/src/commonTest/         → Unit tests
-└── androidApp/src/androidTest/    → Instrumented tests
+├── androidApp/src/androidTest/    → Instrumented tests
+└── iosApp/iosAppUITests/          → XCUITests
 
 Test Data:
 ├── shared/src/commonTest/fixtures/GraphqlFixtures.kt
@@ -35,7 +41,8 @@ Infrastructure:
 | Type | Tool | Speed | Device? | What's tested |
 |------|------|-------|---------|---------------|
 | Unit | ktor-client-mock | ⚡⚡⚡ | No | Services, repos |
-| Instrumented | MockWebServer | ⚡⚡ | Yes | UI flows |
+| Instrumented | MockWebServer | ⚡⚡ | Yes | Android UI flows |
+| iOS XCUITest | MockEngine via launch args | ⚡⚡ | Simulator | ArticlesScreen |
 | Firebase Test Lab | MockWebServer | ⚡ | Cloud | Real devices |
 
 ## 📊 Current Coverage
@@ -166,6 +173,7 @@ fun articlesScreen_displaysArticles() {
 3. Add ViewModel tests with Turbine
 4. Add UI tests for remaining screens
 5. Consider screenshot tests with Paparazzi
+6. Codemagic already publishes JUnit + FTL/XCUITest media — see [RUNNING_TESTS.md](./RUNNING_TESTS.md#running-in-ci-codemagic)
 
 ---
 

@@ -174,7 +174,7 @@ DailyPulse/
 
 1. **Para MockWebServer em testes instrumentados:** ✅ **Sim, funciona perfeitamente**
    - Emulador local ✅
-   - Codemagic CI ✅
+   - Codemagic CI ✅ (unitários JVM, XCUITest iOS, FTL + aba Tests / Artifacts)
    - Firebase Test Lab ✅
 
 2. **Melhor cobertura de teste:**
@@ -199,7 +199,7 @@ DailyPulse/
 ### Médio Prazo
 - [ ] Testes de ViewModel com Turbine
 - [ ] Screenshot tests (Paparazzi)
-- [ ] CI step com emulador no Codemagic
+- [x] Relatórios JUnit, `.xcresult` e mídia FTL no Codemagic (`codemagic.yaml`)
 
 ## 📚 Documentação
 

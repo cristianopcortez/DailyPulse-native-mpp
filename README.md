@@ -16,9 +16,12 @@ The goal of this fork is not to teach KMP from scratch; it is to **showcase, in 
 
 Pushes to **`main`** trigger the [`kmp-workflow`](./codemagic.yaml) pipeline (**KMP Build & Test Lab**). The workflow:
 
+- Runs **JVM unit tests** (`./gradlew :shared:testDebugUnitTest`) and publishes JUnit XML to the Codemagic **Tests** tab
 - Builds the Android **mpp** debug app and its instrumentation test APK
-- Runs **iOS** unit and UI tests on the simulator (with XCUITest media extraction)
-- Runs **Firebase Test Lab** instrumentation on Android
+- Runs **iOS** XCTest + XCUITest on the simulator (`xcodebuild test`), converts `.xcresult` to JUnit, and extracts XCUITest screenshots
+- Runs **Firebase Test Lab** instrumentation on Android, then downloads logcat, videos, and screenshots into `build/ftl-results`
+
+Published **Artifacts** include `shared/build/reports/**`, `androidApp/build/reports/**`, `iosApp/TestResults.xcresult`, `iosApp/TestMedia/**`, `build/ftl-results/**`, and the APKs.
 
 Codemagic build pages require a logged-in account, so the screenshots below document the last successful run for visitors browsing the repo on GitHub.
 
@@ -82,10 +85,11 @@ DailyPulse showcases a **production-grade multi-layered testing strategy** that 
 | Layer | Tool | Speed | Device? | Coverage | Tests |
 |-------|------|-------|---------|----------|-------|
 | **Unit** | `ktor-client-mock` | ⚡⚡⚡ ~10s | No | Services, repos, use cases | 7 tests |
-| **Instrumented** | `MockWebServer` | ⚡⚡ ~60s | Emulator/Device | E2E UI flows, error states | 5 tests |
-| **Firebase Test Lab** | `MockWebServer` | ⚡ ~5min | Real devices | Device compatibility | Same as instrumented |
+| **Instrumented (Android)** | `MockWebServer` | ⚡⚡ ~60s | Emulator/Device | E2E UI flows, error states | 5 tests |
+| **UI (iOS XCUITest)** | `TestBffConfig` + Ktor MockEngine | ⚡⚡ | Simulator | Articles list, scroll, backend error | 4 tests |
+| **Firebase Test Lab** | `MockWebServer` | ⚡ ~5min | Real devices | Device compatibility | Same as Android instrumented |
 
-**Total: 12 automated tests** running deterministically without any external backend.
+**Total: 16 automated tests** running deterministically without any external backend.
 
 ### 🚀 Quick Start
 
@@ -112,6 +116,8 @@ TestBffConfig.setOverride("http://127.0.0.1:12345")
 TestBffConfig.getGraphqlUrl() // http://127.0.0.1:12345/graphql
 ```
 No build flavors or compile-time flags needed—tests inject mock URLs seamlessly.
+
+On **iOS XCUITest**, the test process cannot call Kotlin. The app is launched with `-ui-testing` / `UI_TESTING_SCENARIO`; `iOSApp.swift` calls `TestBffConfig.setOverride` and `setUiTestScenario` before Koin so GraphQL is served in-process.
 
 #### 2. **MockWebServer Intelligent Dispatcher**
 ```kotlin
@@ -149,13 +155,13 @@ Injects test Koin modules before the app initializes, enabling complete DI overr
 - ❌ No coverage for GraphQL parsing, error states, UI flows
 
 #### After Testing Implementation
-- ✅ **12 automated tests** (7 unit + 5 instrumented)
+- ✅ **16 automated tests** (7 unit + 5 Android instrumented + 4 iOS XCUITest)
 - ✅ **Zero external dependencies** - all tests self-contained
 - ✅ **100% deterministic** - same results every run
-- ✅ **Zero configuration** - just `./gradlew test`
+- ✅ **Zero configuration** - just `./gradlew test` (Android) or `xcodebuild test` (iOS)
 - ✅ **Stable on physical devices** - tested on Moto G(6) Plus, multiple emulators
-- ✅ **CI-ready** - passing consistently on Codemagic and Firebase Test Lab
-- ✅ **Well-documented** - 2,600+ lines of guides and examples
+- ✅ **CI-ready** - JVM, iOS simulator, and Firebase Test Lab on Codemagic, with JUnit + media artifacts
+- ✅ **Well-documented** - guides in [`docs/testing/`](./docs/testing/)
 
 ### 🧪 What Gets Tested
 
@@ -179,7 +185,11 @@ Injects test Koin modules before the app initializes, enabling complete DI overr
   - Error message display on server errors
   - Empty state handling
 
-All tests use **centralized fixtures** (`GraphqlFixtures.kt`, `AndroidGraphqlFixtures.kt`) for maintainable test data.
+#### iOS XCUITests (`iosApp/iosAppUITests/`)
+- ✅ **iosAppUITests** — app reaches foreground with mocked GraphQL
+- ✅ **ArticlesScreenUITests** — list from mock, secondary article (scroll-tolerant), backend error
+
+All tests use **centralized fixtures** (`GraphqlFixtures.kt`, `AndroidGraphqlFixtures.kt`, `UiTestGraphqlFixtures.kt`) for maintainable test data.
 
 ### 📁 Test Infrastructure
 
@@ -195,14 +205,19 @@ DailyPulse/
 │       └── sources/data/
 │           └── SourcesServiceTest.kt      # 3 unit tests
 │
-└── androidApp/src/androidTest/
-    ├── DailyPulseTestRunner.kt            # Custom AndroidJUnitRunner
-    ├── TestDailyPulseApp.kt               # Test Application with DI override
-    ├── di/TestKoinModules.kt              # Test Koin configuration
-    ├── fixtures/AndroidGraphqlFixtures.kt # UI test data
-    └── screens/
-        ├── ArticlesScreenTest.kt          # 3 UI tests
-        └── ArticlesScreenErrorTest.kt     # 2 error tests
+├── androidApp/src/androidTest/
+│   ├── DailyPulseTestRunner.kt            # Custom AndroidJUnitRunner
+│   ├── TestDailyPulseApp.kt               # Test Application with DI override
+│   ├── di/TestKoinModules.kt              # Test Koin configuration
+│   ├── fixtures/AndroidGraphqlFixtures.kt # UI test data
+│   └── screens/
+│       ├── ArticlesScreenTest.kt          # 3 UI tests
+│       └── ArticlesScreenErrorTest.kt     # 2 error tests
+│
+└── iosApp/iosAppUITests/
+    ├── UITestLaunch.swift                 # -ui-testing launch args
+    ├── iosAppUITests.swift                # smoke
+    └── ArticlesScreenUITests.swift        # list / scroll / error
 ```
 
 ### 🎓 Complete Documentation
@@ -236,6 +251,7 @@ Tests are **stable on physical devices** (validated on Moto G(6) Plus, API 28):
 ```kotlin
 // gradle/libs.versions.toml
 ktor-client-mock = "3.5.2"    // Unit test mocking
+kotlinx-coroutines-test = "1.11.0" // runTest in commonTest
 mockwebserver = "4.12.0"       // Instrumented test mocking
 turbine = "1.2.0"              // Flow testing (future use)
 ```

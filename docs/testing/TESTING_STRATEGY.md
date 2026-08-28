@@ -162,7 +162,7 @@ class ArticlesScreenTest {
 - [ ] Create `TestDailyPulseApp` or injection mechanism
 - [ ] Write `ArticlesScreenTest`
 - [ ] Write `SourcesScreenTest`
-- [ ] Update Codemagic to run `connectedAndroidTest`
+- [x] Codemagic: JVM unit tests, iOS `xcodebuild test`, FTL (not local `connectedAndroidTest` on Mac M2)
 
 ### Phase 4: Firebase Test Lab
 - [ ] Verify MockWebServer works on FTL devices

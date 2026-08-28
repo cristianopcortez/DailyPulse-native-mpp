@@ -16,9 +16,12 @@ O objetivo desta versão **não é ensinar KMP do zero**; é **mostrar, em um ú
 
 Pushes para **`main`** disparam o pipeline [`kmp-workflow`](./codemagic.yaml) (**KMP Build & Test Lab**). A esteira:
 
+- Roda **testes unitários JVM** (`./gradlew :shared:testDebugUnitTest`) e publica JUnit XML na aba **Tests** do Codemagic
 - Gera o app Android **mpp** debug e o APK de testes instrumentados
-- Roda testes **iOS** no simulador (unitários + UI, com extração de mídia do XCUITest)
-- Executa testes instrumentados no **Firebase Test Lab** (Android)
+- Roda **XCTest + XCUITest** no simulador iOS (`xcodebuild test`), converte `.xcresult` para JUnit e extrai screenshots
+- Executa testes instrumentados no **Firebase Test Lab** (Android) e baixa logcat, vídeos e screenshots para `build/ftl-results`
+
+Os **Artifacts** incluem `shared/build/reports/**`, `androidApp/build/reports/**`, `iosApp/TestResults.xcresult`, `iosApp/TestMedia/**`, `build/ftl-results/**` e os APKs.
 
 As páginas de build no Codemagic exigem login, então os screenshots abaixo documentam a última execução bem-sucedida para quem navega o repositório no GitHub.
 
@@ -82,10 +85,11 @@ O DailyPulse demonstra uma **estratégia de testes multi-camadas de nível produ
 | Camada | Ferramenta | Velocidade | Device? | Cobertura | Testes |
 |--------|-----------|-----------|---------|-----------|--------|
 | **Unitários** | `ktor-client-mock` | ⚡⚡⚡ ~10s | Não | Services, repos, use cases | 7 testes |
-| **Instrumentados** | `MockWebServer` | ⚡⚡ ~60s | Emulador/Device | Fluxos E2E, estados de erro | 5 testes |
-| **Firebase Test Lab** | `MockWebServer` | ⚡ ~5min | Devices reais | Compatibilidade | Mesmos que instrumentados |
+| **Instrumentados (Android)** | `MockWebServer` | ⚡⚡ ~60s | Emulador/Device | Fluxos E2E, estados de erro | 5 testes |
+| **UI (iOS XCUITest)** | `TestBffConfig` + Ktor MockEngine | ⚡⚡ | Simulador | Lista de artigos, scroll, erro de backend | 4 testes |
+| **Firebase Test Lab** | `MockWebServer` | ⚡ ~5min | Devices reais | Compatibilidade | Mesmos que instrumentados Android |
 
-**Total: 12 testes automatizados** rodando de forma determinística sem qualquer backend externo.
+**Total: 16 testes automatizados** rodando de forma determinística sem qualquer backend externo.
 
 ### 🚀 Quick Start
 
@@ -112,6 +116,8 @@ TestBffConfig.setOverride("http://127.0.0.1:12345")
 TestBffConfig.getGraphqlUrl() // http://127.0.0.1:12345/graphql
 ```
 Sem necessidade de build flavors ou flags de compilação—testes injetam URLs mock sem atrito.
+
+No **XCUITest iOS**, o processo de teste não chama Kotlin. O app sobe com `-ui-testing` / `UI_TESTING_SCENARIO`; o `iOSApp.swift` chama `TestBffConfig.setOverride` e `setUiTestScenario` antes do Koin e o GraphQL é servido in-process.
 
 #### 2. **Dispatcher Inteligente do MockWebServer**
 ```kotlin
@@ -149,13 +155,13 @@ Injeta módulos Koin de teste antes do app inicializar, permitindo override comp
 - ❌ Zero cobertura para parsing GraphQL, estados de erro, fluxos de UI
 
 #### Depois da Implementação de Testes
-- ✅ **12 testes automatizados** (7 unitários + 5 instrumentados)
+- ✅ **16 testes automatizados** (7 unitários + 5 instrumentados Android + 4 XCUITest iOS)
 - ✅ **Zero dependências externas** - todos os testes autocontidos
 - ✅ **100% determinísticos** - mesmos resultados a cada execução
-- ✅ **Zero configuração** - apenas `./gradlew test`
+- ✅ **Zero configuração** - apenas `./gradlew test` (Android) ou `xcodebuild test` (iOS)
 - ✅ **Estáveis em devices físicos** - testado em Moto G(6) Plus, múltiplos emuladores
-- ✅ **Prontos para CI** - passando consistentemente no Codemagic e Firebase Test Lab
-- ✅ **Bem documentados** - 2.600+ linhas de guias e exemplos
+- ✅ **Prontos para CI** - JVM, simulador iOS e Firebase Test Lab no Codemagic, com JUnit e mídia nos artifacts
+- ✅ **Bem documentados** - guias em [`docs/testing/`](./docs/testing/)
 
 ### 🧪 O que é Testado
 
@@ -179,7 +185,11 @@ Injeta módulos Koin de teste antes do app inicializar, permitindo override comp
   - Exibição de mensagens de erro
   - Tratamento de estado vazio
 
-Todos os testes usam **fixtures centralizados** (`GraphqlFixtures.kt`, `AndroidGraphqlFixtures.kt`) para dados de teste manuteníveis.
+#### XCUITests iOS (`iosApp/iosAppUITests/`)
+- ✅ **iosAppUITests** — app chega em foreground com GraphQL mockado
+- ✅ **ArticlesScreenUITests** — lista do mock, artigo secundário (scroll tolerante), erro de backend
+
+Todos os testes usam **fixtures centralizados** (`GraphqlFixtures.kt`, `AndroidGraphqlFixtures.kt`, `UiTestGraphqlFixtures.kt`) para dados de teste manuteníveis.
 
 ### 📁 Infraestrutura de Testes
 
@@ -195,14 +205,19 @@ DailyPulse/
 │       └── sources/data/
 │           └── SourcesServiceTest.kt      # 3 testes unitários
 │
-└── androidApp/src/androidTest/
-    ├── DailyPulseTestRunner.kt            # AndroidJUnitRunner customizado
-    ├── TestDailyPulseApp.kt               # Aplicação de teste com override de DI
-    ├── di/TestKoinModules.kt              # Configuração Koin para testes
-    ├── fixtures/AndroidGraphqlFixtures.kt # Dados para testes de UI
-    └── screens/
-        ├── ArticlesScreenTest.kt          # 3 testes de UI
-        └── ArticlesScreenErrorTest.kt     # 2 testes de erro
+├── androidApp/src/androidTest/
+│   ├── DailyPulseTestRunner.kt            # AndroidJUnitRunner customizado
+│   ├── TestDailyPulseApp.kt               # Aplicação de teste com override de DI
+│   ├── di/TestKoinModules.kt              # Configuração Koin para testes
+│   ├── fixtures/AndroidGraphqlFixtures.kt # Dados para testes de UI
+│   └── screens/
+│       ├── ArticlesScreenTest.kt          # 3 testes de UI
+│       └── ArticlesScreenErrorTest.kt     # 2 testes de erro
+│
+└── iosApp/iosAppUITests/
+    ├── UITestLaunch.swift                 # launch args -ui-testing
+    ├── iosAppUITests.swift                # smoke
+    └── ArticlesScreenUITests.swift        # lista / scroll / erro
 ```
 
 ### 🎓 Documentação Completa
@@ -236,6 +251,8 @@ Os testes são **estáveis em devices físicos** (validado em Moto G(6) Plus, AP
 ```kotlin
 // gradle/libs.versions.toml
 ktor-client-mock = "3.5.2"    // Mocking para testes unitários
+kotlinx-coroutines-test = "1.11.0" // runTest no commonTest
+mockwebserver = "4.12.0"       // Mocking para testes instrumentados
 mockwebserver = "4.12.0"       // Mocking para testes instrumentados
 turbine = "1.2.0"              // Testes de Flow (uso futuro)
 ```

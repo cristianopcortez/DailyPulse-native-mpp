@@ -2,7 +2,9 @@
 
 ## Overview
 
-This directory contains the testing strategy and implementation for DailyPulse, featuring a multi-layered approach with MockWebServer for instrumented tests and ktor-client-mock for unit tests.
+This directory contains the testing strategy and implementation for DailyPulse: JVM unit tests (`ktor-client-mock`), Android instrumented UI tests (`MockWebServer`), iOS XCUITests (`TestBffConfig` + in-process MockEngine), and Firebase Test Lab.
+
+Codemagic (`codemagic.yaml` **kmp-workflow**) runs the JVM and iOS suites, publishes JUnit to the Tests tab, and downloads FTL media into `build/ftl-results`. See [RUNNING_TESTS.md](./RUNNING_TESTS.md#running-in-ci-codemagic).
 
 ## Files in this Directory
 
@@ -47,10 +49,16 @@ gcloud firebase test android run \
    - Speed: ~30-60 seconds (local emulator)
    - Coverage: End-to-end user journeys
 
-3. **Firebase Test Lab** - Real device validation
-   - Same tests as instrumented, but on real devices
+3. **iOS XCUITests (`iosAppUITests`)** - Simulator UI tests with in-process GraphQL mocks
+   - Location: `iosApp/iosAppUITests/`
+   - Launch args: `-ui-testing`, `-ui-testing-scenario success|error`
+   - Speed: ~1–2 minutes on Codemagic simulator
+   - Coverage: Articles list, secondary article (scroll), backend error
+
+4. **Firebase Test Lab** - Real device validation
+   - Same Android instrumented tests, on cloud devices
    - Speed: ~5-10 minutes
-   - Coverage: Device compatibility, real-world scenarios
+   - Coverage: Device compatibility; CI copies screenshots/logcat/video to `build/ftl-results`
 
 ### Key Components
 
@@ -66,7 +74,13 @@ gcloud firebase test android run \
 - `DailyPulseTestRunner` - Custom test runner
 - `TestDailyPulseApp` - Test application
 - `AndroidGraphqlFixtures.kt` - Test data
-- `ArticlesScreenTest.kt` - Example UI test
+- `ArticlesScreenTest.kt` / `ArticlesScreenErrorTest.kt`
+
+#### For iOS XCUITests
+- `TestBffConfig.setUiTestScenario` - in-process MockEngine (XCUITest is a separate process)
+- `iosApp/iOSApp.swift` - reads launch arguments before `initKoin()`
+- `ArticlesScreenUITests.swift` / `UITestLaunch.swift`
+- Accessibility: `articles_screen`, `articles_list`, `article_item`, `articles_error`
 
 ## Benefits
 
@@ -117,17 +131,18 @@ mockWebServer.dispatcher = object : Dispatcher() {
 
 ## Migration Status
 
-- ✅ Dependencies added (`ktor-client-mock`, `mockwebserver`, `turbine`)
+- ✅ Dependencies added (`ktor-client-mock`, `kotlinx-coroutines-test`, `mockwebserver`, `turbine`)
 - ✅ `TestBffConfig` infrastructure created
 - ✅ Services updated to use `TestBffConfig`
 - ✅ Unit test fixtures created
 - ✅ Example unit test (`ArticlesServiceTest`)
 - ✅ Instrumented test infrastructure (runner, test app, modules)
 - ✅ Example UI tests (`ArticlesScreenTest`, `ArticlesScreenErrorTest`)
+- ✅ iOS XCUITests (`ArticlesScreenUITests`) with launch-arg mock injection
 - ✅ Documentation complete
-- 🔲 Additional unit tests for all services
-- 🔲 Additional UI tests for all screens
-- 🔲 CI integration (add emulator step to Codemagic)
+- ✅ CI: JVM unit tests, iOS `xcodebuild test`, FTL + JUnit/media artifacts on Codemagic
+- 🔲 Additional unit tests for remaining services
+- 🔲 Additional UI tests for SourcesScreen / AboutScreen
 
 ## Next Steps
 
@@ -148,10 +163,7 @@ mockWebServer.dispatcher = object : Dispatcher() {
    - Add tests for repositories
    - Add UI tests for SourcesScreen, AboutScreen
 
-3. **Integrate with CI:**
-   - Update `codemagic.yaml` to run unit tests
-   - Optionally add emulator step for instrumented tests
-   - Keep Firebase Test Lab for final validation
+3. **Integrate with CI:** already done in `codemagic.yaml` (JVM JUnit, iOS `.xcresult` → JUnit, FTL download). Optional: add a Codemagic Android emulator step for `connectedMppDebugAndroidTest` if you want instrumented tests without FTL.
 
 ## Troubleshooting
 

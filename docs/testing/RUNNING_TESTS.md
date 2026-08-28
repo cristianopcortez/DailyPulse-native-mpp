@@ -108,31 +108,25 @@ gcloud firebase test android run \
 
 ## Running in CI (Codemagic)
 
-The CI pipeline is already configured in `codemagic.yaml`. It runs:
+Pushes to `main` run [`kmp-workflow`](../../codemagic.yaml). Each test script sets `test_report:` so the **Tests** tab shows JUnit results. Media and HTML reports are listed under **Artifacts**.
 
-1. **Unit tests** - `./gradlew :shared:testDebugUnitTest`
-2. **iOS tests** - `xcodebuild test`
-3. **Firebase Test Lab** - Builds APKs and uploads to FTL
+| Step | What runs | Tests tab (`test_report`) | Artifacts |
+|------|-----------|---------------------------|-----------|
+| Android / JVM unit tests | `./gradlew :shared:testDebugUnitTest` | `**/build/test-results/**/*.xml` | `shared/build/reports/**` |
+| Build Android | `assembleMppDebug` + `assembleMppDebugAndroidTest` | — | APKs |
+| iOS simulator tests | `xcodebuild test` → `iosApp/TestResults.xcresult`, then `xcode-project junit-test-results` | `iosApp/test-reports/*.xml` | `.xcresult`, `iosApp/TestMedia/**`, JUnit XML |
+| Extract XCUITest media | `xcparse screenshots` | — | screenshots |
+| Firebase Test Lab | `gcloud firebase test android run` + `gsutil` download | `build/ftl-results/**/*.xml` | `build/ftl-results/**` (logcat, video, screenshots) |
 
-### Current Codemagic Configuration
+iOS XCUITests launch the app with `-ui-testing` so GraphQL is mocked in-process (no live BFF). Android instrumented tests on FTL use MockWebServer on-device.
 
-The pipeline already includes Firebase Test Lab:
+Codemagic does **not** ingest `.xcresult` directly: the workflow converts it to JUnit XML. Keep the bundle as an artifact for Xcode.
 
-```yaml
-- name: Run Tests on Firebase Test Lab (Android)
-  script: |
-    gcloud auth activate-service-account --key-file=./gcloud_key.json
-    gcloud --quiet config set project dailypulse-kmp
-    gcloud firebase test android run \
-      --type instrumentation \
-      --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
-      --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
-      --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait
-```
+Optional `FTL_RESULTS_BUCKET` env var pins the GCS bucket; otherwise the path is parsed from `gcloud` logs.
 
-### Adding Emulator Tests to CI
+### Adding emulator instrumented tests (optional)
 
-To run instrumented tests on the Codemagic Mac emulator (faster than FTL):
+Android emulators are limited on Apple Silicon Codemagic machines. FTL is the supported path for instrumented UI. If you add a Linux/Android workflow later:
 
 ```yaml
 - name: Run Instrumented Tests (Emulator)
@@ -168,19 +162,22 @@ DailyPulse/
 │               └── fixtures/
 │                   └── GraphqlFixtures.kt                # 📦 Test data
 │
-└── androidApp/
-    └── src/
-        └── androidTest/
-            └── java/.../android/
-                ├── di/
-                │   └── TestKoinModules.kt                # 🔧 DI config
-                ├── fixtures/
-                │   └── AndroidGraphqlFixtures.kt         # 📦 Test data
-                ├── screens/
-                │   ├── ArticlesScreenTest.kt             # ✅ UI tests
-                │   └── ArticlesScreenErrorTest.kt        # ✅ Error tests
-                ├── DailyPulseTestRunner.kt               # 🏃 Test runner
-                └── TestDailyPulseApp.kt                  # 📱 Test app
+├── androidApp/
+│   └── src/
+│       └── androidTest/
+│           └── java/.../android/
+│               ├── di/TestKoinModules.kt
+│               ├── fixtures/AndroidGraphqlFixtures.kt
+│               ├── screens/
+│               │   ├── ArticlesScreenTest.kt
+│               │   └── ArticlesScreenErrorTest.kt
+│               ├── DailyPulseTestRunner.kt
+│               └── TestDailyPulseApp.kt
+│
+└── iosApp/iosAppUITests/
+    ├── UITestLaunch.swift
+    ├── iosAppUITests.swift
+    └── ArticlesScreenUITests.swift
 ```
 
 ## Troubleshooting
