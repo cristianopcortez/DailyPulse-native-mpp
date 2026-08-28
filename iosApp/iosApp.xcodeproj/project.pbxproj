@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		F1E20C0A242A565900829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E20C08242A565900829871 /* iosAppUITests.swift */; };
+		F2A31B01242A565900829871 /* ArticlesScreenUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A31B00242A565900829871 /* ArticlesScreenUITests.swift */; };
+		F2A31B03242A565900829871 /* UITestLaunch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A31B02242A565900829871 /* UITestLaunch.swift */; };
 		E4D2A109242A565900829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D2A107242A565900829871 /* iosAppTests.swift */; };
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
@@ -42,6 +44,8 @@
 		E4D2A107242A565900829871 /* iosAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosAppTests.swift; sourceTree = "<group>"; };
 		E4D2A108242A565900829871 /* iosAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1E20C08242A565900829871 /* iosAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosAppUITests.swift; sourceTree = "<group>"; };
+		F2A31B00242A565900829871 /* ArticlesScreenUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticlesScreenUITests.swift; sourceTree = "<group>"; };
+		F2A31B02242A565900829871 /* UITestLaunch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestLaunch.swift; sourceTree = "<group>"; };
 		F1E20C09242A565900829871 /* iosAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iosAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B001FA01242A565900829871 /* NativeRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeRootView.swift; sourceTree = "<group>"; };
@@ -142,6 +146,8 @@
 			isa = PBXGroup;
 			children = (
 				F1E20C08242A565900829871 /* iosAppUITests.swift */,
+				F2A31B00242A565900829871 /* ArticlesScreenUITests.swift */,
+				F2A31B02242A565900829871 /* UITestLaunch.swift */,
 			);
 			path = iosAppUITests;
 			sourceTree = "<group>";
@@ -328,6 +334,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1E20C0A242A565900829871 /* iosAppUITests.swift in Sources */,
+				F2A31B01242A565900829871 /* ArticlesScreenUITests.swift in Sources */,
+				F2A31B03242A565900829871 /* UITestLaunch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -30,6 +30,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -60,7 +62,7 @@ fun ArticlesScreenContent(
 ) {
     val articlesState by articlesViewModel.articlesState.collectAsState()
 
-    Column {
+    Column(modifier = Modifier.semantics { testTag = "articles_screen" }) {
         AppBar()
 
         articlesState.error?.let { ErrorMessage(it) }
@@ -70,7 +72,9 @@ fun ArticlesScreenContent(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(
+                        modifier = Modifier.semantics { testTag = "articles_loading" },
+                    )
                 }
             }
             articlesState.articles.isNotEmpty() -> {
@@ -86,7 +90,12 @@ private fun AppBar() {
     val navigator = LocalNavigator.currentOrThrow
 
     TopAppBar(
-        title = { Text(text = "Articles") },
+        title = {
+            Text(
+                text = "Articles",
+                modifier = Modifier.semantics { testTag = "articles_title" },
+            )
+        },
         actions = {
             IconButton(onClick = {
                 navigator.push(AggregatorScreen())
@@ -128,7 +137,11 @@ fun ArticlesListView(viewModel: ArticlesViewModel) {
     Box(
         modifier = Modifier.pullRefresh(state = pullRefreshState)
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics { testTag = "articles_list" }
+        ) {
             items(articlesState.articles) { article ->
                 ArticleItemView(article = article)
             }
@@ -148,6 +161,7 @@ fun ArticleItemView(article: Article) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
+            .semantics { testTag = "article_item" }
     ) {
         if (article.imageUrl.isNotBlank()) {
             KamelImage(

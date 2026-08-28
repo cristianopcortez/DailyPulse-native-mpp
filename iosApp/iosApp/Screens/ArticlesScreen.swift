@@ -62,9 +62,11 @@ struct ArticlesScreen: View {
                         }
                     }
                 }
+                .accessibilityIdentifier("articles_list")
             }
 
         }
+        .accessibilityIdentifier("articles_screen")
         .onAppear {
             self.viewModel.startObserving()
         }
@@ -80,6 +82,7 @@ struct AppBar: View {
         Text("Articles")
             .font(.largeTitle)
             .fontWeight(.bold)
+            .accessibilityIdentifier("articles_title")
     }
 }
 
@@ -106,6 +109,7 @@ struct ArticleItemView: View {
             Text(article.date).frame(maxWidth: .infinity, alignment: .trailing).foregroundStyle(.gray)
         }
         .padding(16)
+        .accessibilityIdentifier("article_item")
     }
 }
 
@@ -121,5 +125,6 @@ struct ErrorMessage: View {
     var body: some View {
         Text(message)
             .font(.title)
+            .accessibilityIdentifier("articles_error")
     }
 }

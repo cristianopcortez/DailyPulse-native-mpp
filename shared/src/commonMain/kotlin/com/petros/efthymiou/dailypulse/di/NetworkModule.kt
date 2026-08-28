@@ -1,5 +1,7 @@
 package com.petros.efthymiou.dailypulse.di
 
+import com.petros.efthymiou.dailypulse.network.TestBffConfig
+import com.petros.efthymiou.dailypulse.network.createUiTestHttpClient
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -9,15 +11,20 @@ import org.koin.dsl.module
 val networkModule = module {
 
     single<HttpClient> {
-        HttpClient {
-            expectSuccess = false
-            install(ContentNegotiation) {
-                json(Json {
-                    prettyPrint = true
-                    isLenient = true
-                    ignoreUnknownKeys = true
-                    encodeDefaults = true
-                })
+        val uiTestScenario = TestBffConfig.getUiTestScenario()
+        if (uiTestScenario != null) {
+            createUiTestHttpClient(uiTestScenario)
+        } else {
+            HttpClient {
+                expectSuccess = false
+                install(ContentNegotiation) {
+                    json(Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                        encodeDefaults = true
+                    })
+                }
             }
         }
     }

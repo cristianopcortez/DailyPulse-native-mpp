@@ -19,6 +19,13 @@ object TestBffConfig {
      */
     @Volatile
     private var overrideUrl: String? = null
+
+    /**
+     * When non-null, networkModule serves canned GraphQL responses instead of the real BFF.
+     * Values: [UiTestScenario.SUCCESS], [UiTestScenario.ERROR].
+     */
+    @Volatile
+    private var uiTestScenario: String? = null
     
     /**
      * Get the effective base URL: runtime override if set, otherwise compile-time default.
@@ -37,11 +44,29 @@ object TestBffConfig {
     fun setOverride(url: String?) {
         overrideUrl = url
     }
+
+    /**
+     * Enable in-process GraphQL mocking for UI tests (iOS XCUITest launch arguments).
+     * Call before Koin starts so the [io.ktor.client.HttpClient] single is created with MockEngine.
+     */
+    fun setUiTestScenario(scenario: String?) {
+        uiTestScenario = scenario
+    }
+
+    fun getUiTestScenario(): String? = uiTestScenario
+
+    fun isUiTesting(): Boolean = uiTestScenario != null
     
     /**
      * Clear the runtime override. Useful in test teardown.
      */
     fun clearOverride() {
         overrideUrl = null
+        uiTestScenario = null
     }
+}
+
+object UiTestScenario {
+    const val SUCCESS = "success"
+    const val ERROR = "error"
 }
