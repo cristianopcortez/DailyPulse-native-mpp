@@ -39,20 +39,20 @@ object GraphqlFixtures {
       {
         "id": "techcrunch",
         "name": "TechCrunch",
-        "category": "Technology",
-        "country": "US"
+        "desc": "Technology",
+        "origin": "US"
       },
       {
         "id": "wired",
         "name": "Wired",
-        "category": "Technology",
-        "country": "US"
+        "desc": "Technology",
+        "origin": "US"
       },
       {
         "id": "theverge",
         "name": "The Verge",
-        "category": "Technology",
-        "country": "US"
+        "desc": "Technology",
+        "origin": "US"
       }
     ]
   }

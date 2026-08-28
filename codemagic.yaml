@@ -23,6 +23,11 @@ workflows:
           fi
           # Using -D for macOS base64 compatibility
           echo "$GCLOUD_SERVICE_ACCOUNT_CREDENTIALS" | base64 -D > ./gcloud_key.json
+      - name: Android / JVM unit tests
+        script: |
+          chmod +x gradlew
+          ./gradlew :shared:testDebugUnitTest
+        test_report: "**/build/test-results/**/*.xml"
       - name: Build Android (mpp debug + androidTest)
         script: |
           chmod +x gradlew
@@ -51,6 +56,14 @@ workflows:
             -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
             -resultBundlePath TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO
+          cd ..
+
+          # Codemagic's Tests tab consumes JUnit XML, not .xcresult.
+          mkdir -p iosApp/test-reports
+          xcode-project junit-test-results \
+            --xcresult iosApp/TestResults.xcresult \
+            --output-dir iosApp/test-reports
+        test_report: iosApp/test-reports/*.xml
       - name: Extract Media from XCUITest
         script: |
           # 5. Create a directory for media attachments
@@ -70,15 +83,69 @@ workflows:
 
       - name: Run Tests on Firebase Test Lab (Android)
         script: |
+          set -e
           gcloud auth activate-service-account --key-file=./gcloud_key.json
           gcloud --quiet config set project dailypulse-kmp
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
-            --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
-            --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait
+
+          mkdir -p build/ftl-results
+          FTL_RESULTS_DIR="dailypulse-${CM_BUILD_ID:-local}-$(date +%s)"
+          FTL_LOG="build/ftl-results/gcloud.log"
+
+          set +e
+          if [ -n "$FTL_RESULTS_BUCKET" ]; then
+            gcloud firebase test android run \
+              --type instrumentation \
+              --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
+              --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
+              --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
+              --record-video \
+              --results-bucket "$FTL_RESULTS_BUCKET" \
+              --results-dir "$FTL_RESULTS_DIR" \
+              > "$FTL_LOG" 2>&1
+          else
+            gcloud firebase test android run \
+              --type instrumentation \
+              --app androidApp/build/outputs/apk/mpp/debug/androidApp-mpp-debug.apk \
+              --test androidApp/build/outputs/apk/androidTest/mpp/debug/androidApp-mpp-debug-androidTest.apk \
+              --device model=MediumPhone.arm,version=34,locale=en,orientation=portrait \
+              --record-video \
+              --results-dir "$FTL_RESULTS_DIR" \
+              > "$FTL_LOG" 2>&1
+          fi
+          FTL_EXIT=$?
+          set -e
+          cat "$FTL_LOG"
+
+          GCS_URI="$(grep -Eo 'gs://[^][:space:]]+' "$FTL_LOG" | head -1 || true)"
+          if [ -z "$GCS_URI" ]; then
+            BROWSER_PATH="$(grep -Eo 'storage/browser/[^]]+' "$FTL_LOG" | head -1 || true)"
+            if [ -n "$BROWSER_PATH" ]; then
+              GCS_URI="gs://${BROWSER_PATH#storage/browser/}"
+            elif [ -n "$FTL_RESULTS_BUCKET" ]; then
+              GCS_URI="gs://${FTL_RESULTS_BUCKET#gs://}/${FTL_RESULTS_DIR}"
+            fi
+          fi
+
+          echo "FTL GCS URI: ${GCS_URI:-<not found>}"
+          if [ -n "$GCS_URI" ]; then
+            # Screenshots, logcat, videos, and JUnit XML from the FTL device run.
+            gsutil -m cp -r "$GCS_URI" build/ftl-results/ || \
+              gcloud storage cp --recursive "$GCS_URI" build/ftl-results/
+          else
+            echo "Warning: could not resolve FTL Cloud Storage path; skipping download."
+          fi
+
+          echo "--- Content of build/ftl-results ---"
+          ls -R build/ftl-results || true
+
+          exit "$FTL_EXIT"
+        test_report: "build/ftl-results/**/*.xml"
 
     artifacts:
       - iosApp/TestMedia/**/*        # Allows viewing images/videos directly in the Codemagic UI
-      - iosApp/TestResults.xcresult  # Optional: keep the full bundle for deep debugging
+      - iosApp/TestResults.xcresult  # Logs, screenshots and hierarchy of XCUITest
+      - iosApp/test-reports/**       # JUnit XML converted from .xcresult
+      - shared/build/reports/**      # HTML/XML of JVM unit tests
+      - androidApp/build/reports/**  # Android build and test reports
+      - build/ftl-results/**         # Firebase Test Lab recordings, logcat, JUnit
       - androidApp/build/outputs/apk/**/*.apk
