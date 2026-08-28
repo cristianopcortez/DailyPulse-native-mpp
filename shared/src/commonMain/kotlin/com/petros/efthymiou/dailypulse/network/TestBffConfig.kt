@@ -1,5 +1,7 @@
 package com.petros.efthymiou.dailypulse.network
 
+import kotlin.concurrent.Volatile
+
 /**
  * Test-friendly BFF configuration that allows runtime override of the base URL.
  * 
